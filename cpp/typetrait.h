@@ -33,10 +33,6 @@ template<typename T>
 struct is_class : decltype(detail::test<T>(nullptr)) {};
 
 
-struct A{
-    int a;
-    void fun();
-};
 
 
 template<typename T>
@@ -57,4 +53,34 @@ struct is_member_function_pointer_helper<T U::*> :  std::is_function<T>{};
 
 template<typename T>
 struct is_member_function_pointer : is_member_function_pointer_helper<std::remove_cv_t<T>> {};
+
+
+
+template<typename, typename = void>
+struct has_type_member : std::false_type{};
+
+template<typename T>
+struct has_type_member<T, std::void_t<typename T::type>> : std::true_type {};
+
+#if 0
+template<typename, typename = void>
+struct has_toString : std::false_type{};
+
+template<typename T>
+struct has_toString<T, std::void_t<decltype(declval<T>().toString())>> : std::true_type {};
+#endif
+
+
+template<typename T>
+class has_toString 
+{
+  using one = char;
+  using two = struct { char arr[2];};
+  
+  template<typename C> static one test(decltype(&C::toString));
+  template<typename C> static two test(...);
+
+  public:
+  static constexpr int value = (sizeof(test<T>(0)) == 1);
+};
 

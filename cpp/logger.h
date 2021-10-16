@@ -1,10 +1,15 @@
 
+#include "tostring.h"
+
 #include <iostream>
 #include <chrono>
+#include <map>
 
 
 class logger
 {
+  struct options {
+  };
   public:
     enum class level {
       DEBUG,
@@ -14,7 +19,13 @@ class logger
     };
     static std::map<level, std::string> levelStr;
 
-    static void log(level l, const std::string &sourceFileName, unsigned sourceLineNo, const std::string &msg);
+    static void logPrefix (logger::level l, const std::string &sourceFileName, unsigned sourceLineNo);
+
+    template<typename T>
+    static void log(const T& val);
+
+    template<typename T, typename ...Args>
+    static void log(const T& val, const Args& ...args);
   private:
 };
 
@@ -34,18 +45,39 @@ inline std::string currTime()
 }
 
 void
-logger::log(logger::level l, const std::string &sourceFileName, unsigned sourceLineNo, const std::string &msg) 
+logger::logPrefix (logger::level l, 
+           const std::string &sourceFileName, 
+           unsigned sourceLineNo) 
 {
-  std::cout << "[" << logger::levelStr[l] <<  "][" << sourceFileName << ":" << sourceLineNo << "][" << currTime() << "] " << msg;
-  
+  std::cout <<  (std::string("[") + logger::levelStr[l] +  "][" + (sourceFileName + ":" + toString(sourceLineNo)) + "][" + currTime() + "] "); 
 }
 
-#define INFO(msg) \
-  logger::log(logger::level::INFO, __FILE__, __LINE__, msg); 
+template<typename T>
+void
+logger::log(const T &val) 
+{
+  std::cout <<  toString(val)  << std::endl;
+}
 
-#define WARN(msg) \
-  logger::log(logger::level::WARN, __FILE__, __LINE__, msg); 
+template<typename T, typename ...Args>
+void
+logger::log(const T &val, const Args& ...args)
+{
+  std::cout << toString(val); 
+  std::cout << toString<Args...>(args...) << std::endl; 
+}
 
-#define ERROR(msg) \
-  logger::log(logger::level::ERROR, __FILE__, __LINE__, msg); 
+
+
+#define INFO(...) \
+  logger::logPrefix(logger::level::INFO, __FILE__, __LINE__); \
+  logger::log(__VA_ARGS__);
+
+#define WARN(...) \
+  logger::logPrefix(logger::level::WARN, __FILE__, __LINE__); \
+  logger::log(__VA_ARGS__);
+
+#define ERROR(...) \
+  logger::logPrefix(logger::level::ERROR, __FILE__, __LINE__); \
+  logger::log(__VA_ARGS__);
 

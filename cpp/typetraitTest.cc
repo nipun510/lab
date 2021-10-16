@@ -1,5 +1,14 @@
 #include "typetrait.h"
 
+struct A{
+    using type = int;
+    int a;
+    void fun();
+};
+
+struct B {
+};
+
 
 int main()
 {
@@ -12,6 +21,9 @@ int main()
     static_assert(is_member_pointer<decltype(&A::fun)>::value);
     static_assert(std::is_member_function_pointer<decltype(&A::fun)>::value);
     static_assert(is_member_function_pointer<decltype(&A::fun)>::value);
-      static_assert(is_member_pointer<int (A::*)>::value);
+    static_assert(is_member_pointer<int (A::*)>::value);
+    static_assert(has_type_member<A>::value);
+    static_assert(!has_type_member<B>::value);
+    static_assert(!has_type_member<int>::value);
     
 }
