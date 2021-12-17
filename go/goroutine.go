@@ -24,7 +24,7 @@ func spinner(delay time.Duration) {
 
 func main() {
   const n = 45
-	go spinner(100*time.Millisecond)
+  go spinner(100*time.Millisecond)
   fibN := fib(n)
-	fmt.Printf("\rFibonacci(%d) = %d", n, fibN)
+  fmt.Printf("\rFibonacci(%d) = %d", n, fibN)
 }
