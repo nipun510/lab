@@ -8,6 +8,7 @@ add_executable(toStringTest    toStringTest.cc)
 add_executable(observerTest    observerTest.cc)
 add_executable(detailTest      detailTest.cc)
 add_executable(typetraitTest   typetraitTest.cc)
+add_executable(utilTest        utilTest.cc)
 
 enable_testing()
 
@@ -29,3 +30,5 @@ add_test(NAME detail COMMAND detailTest)
 
 #observer testing
 add_test(NAME observer COMMAND observerTest)
+
+add_test(NAME util COMMAND utilTest)

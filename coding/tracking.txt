@@ -1,0 +1,69 @@
+[3 Jan 2022 - 9 Jan 2022]
+1  distribute-coins-in-binary-tree
+2  find-n-unique-integers-sum-up-to-zero
+3  angle-between-hands-of-a-clock
+4  minimum-moves-to-equal-array-elements-ii
+5  boundary-of-binary-tree
+6  string-without-aaa-or-bbb 
+7  restore-ip-addresses
+8  design-tic-tac-toe
+9  max-chunks-to-make-sorted-ii
+10 edit-distance
+11 text-justification
+12 wildcard-matching
+13 plus-one
+14 rotate-list
+15 remove-duplicates-from-sorted-array
+16 remove-nth-node-from-end-of-list
+17 integer-to-roman
+18 first-missing-positive
+19 sudoku-solver
+20 n-ary-tree-level-order-traversal
+21 serialize-and-deserialize-n-ary-tree
+22 web-crawler
+23 maximal-network-rank
+24 replace-all-s-to-avoid-consecutive-repeating-character 
+
+
+[10th Jan 2022 - 16th Jan 2022]
+1  word-ladder
+2  reorganize-string
+3  minimum-time-to-make-rope-colorful
+4  find-winner-on-a-tic-tac-toe-game
+5  course-schedule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,26 +1,59 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
-class Formatter 
+
+namespace util {
+
+std::vector<std::string> 
+split(const std::string &str, char separator = ' ') 
+{
+  if (str.empty()) {
+    return {};
+  }
+
+  std::size_t startPos = str.find_first_not_of(separator, 0);
+  if (startPos == std::string::npos) {
+    return {};
+  }
+  std::vector<std::string> result;
+  while(startPos < str.length()) {
+    auto pos = str.find_first_of(separator, startPos);
+    if (pos != std::string::npos) { 
+      result.push_back(str.substr(startPos, pos - startPos));
+      startPos = str.find_first_not_of(separator, pos + 1);
+    } else {
+      result.push_back(str.substr(startPos));
+      break;
+    }
+  }
+
+  return result;
+}
+
+
+class formatter 
 {
   public:
-    static void printBegin(const std::string &s, std::ostream &os);
-    static void print(const std::string &s, std::ostream &os);
-    static void format() { ++level; }
+    formatter() : _level{0} {}
+    void print(const std::string &s, std::ostream &os);
+    void incrementLevel() { ++_level; }
+    void decrementLevel() { --_level; }
   private:
-    static size_t level;
+    size_t _level;
 };
 
-size_t Formatter::level = 0;
+
+
 
 void 
-Formatter::print(const std::string &s, std::ostream &os = std::cout)
+formatter::print(const std::string &s, std::ostream &os = std::cout)
 {
-  std::string indent(level, " ");
+  std::string indent(_level, ' ');
   size_t start = 0;
   while (start < s.size()) {
-   size_t pos = std::find(s.begin(), s.end(), '\n');
+   size_t pos = s.find('\n');
    if (pos != std::string::npos) {
      std::string line = s.substr(start, pos - start + 1);
      os << indent << line; 
@@ -29,9 +62,4 @@ Formatter::print(const std::string &s, std::ostream &os = std::cout)
   }
 }
 
-void
-Formatter::printBegin(const std::string &s, std::ostream &os = std::cout)
-{
-  level = 0;
-  print(s, os);
-}
+} //namespace util
