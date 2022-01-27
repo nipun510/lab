@@ -1,0 +1,16 @@
+
+
+diff algorithms
+  - Meyers Algorithm
+    - Humanr readable delta/patch out of human readable inputs
+  - Bentley-Mcllroy
+    - when detla size matters
+    - Open VCDiff is prominent usage.
+  - XDelta
+    - speed of delta generation.
+    - able to generate a VCDiff format delta/patch.
+  - BSDiff
+    - Minimum delta/path size
+    - custom delta/path file format
+
+

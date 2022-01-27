@@ -11,7 +11,7 @@ auto apply(T &val, Callable c) -> decltype(std::invoke(c, val)) {
 class A {
     public:
     void fun() {
-        std::cout << "fun\n";
+        std::cout << "fun method\n";
     }
     int val{3};
 };
