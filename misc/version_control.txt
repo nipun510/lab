@@ -1,0 +1,24 @@
+version control Info
+               | p4 add/edit
+  In perforce, first the file has to be opened for add/edit before any change.
+git add        | p4 change
+  In git, files are added to staging area, rest are unstaged. 
+  In perforce files are added to a change list, rest remain in default changelist.
+  In git, changes in a file can partially be added to staging area for commit. 
+  In perfoce, a file can be part of a single changelist.
+git status     |  p4 opened
+git diff       |  p4 diff
+git commit     |  p4 commit
+
+
+git clone url  | 
+  can be used to create a clone of remote repository
+git branch test
+git checkout test
+git push --set-upstream origin test
+  - for forked repository, github ask if you want to create a pull request.
+
+
+git merge --abort
+git rebase --abort
+

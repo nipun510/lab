@@ -1,0 +1,13 @@
+Example : whatsApp
+
+Functional Requirements:
+  - One to one Chat
+  - group chat
+  - Should support Text, images, videos
+  - send, delivered and read receipt
+  - Last seen
+
+Design:
+
+Why need websocket
+  Two way communication. HTTP supports client server mode of communication.

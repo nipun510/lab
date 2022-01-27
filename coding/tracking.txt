@@ -26,13 +26,18 @@
 
 
 [10th Jan 2022 - 16th Jan 2022]
-1  word-ladder
-2  reorganize-string
-3  minimum-time-to-make-rope-colorful
-4  find-winner-on-a-tic-tac-toe-game
-5  course-schedule
+1 word-ladder
+2 reorganize-string
+3 minimum-time-to-make-rope-colorful
+4 find-winner-on-a-tic-tac-toe-game
+5 course-schedule
+6 course-schedule-ii
 
-
+[17th Jan 2022 - 23 Jan 2022]
+1 recover-binary-search-tree
+2 course-schedule-iii
+3 parallel-courses-iii
+4 single-threaded-cpu
 
 
 

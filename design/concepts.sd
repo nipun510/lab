@@ -1,0 +1,56 @@
+synchronous communication
+  - request/response
+  - RPC and REST
+asynchronous communication
+  - event based
+  - choreography
+  - loose coupling, more scalable
+
+
+RPC
+  - Java RMI, SOAP, Trift, gRPC
+  - Terms: Marsheling, Unmarshelling, server stub, client stub
+  upsides:
+    - ease of use
+  downsides:
+    - Technology coupling eg Java RMI
+    - cost associated with remote calls which get mixed with local locals.
+    - change in interface requires Server as well as client stub deployment.
+
+
+REST : REpresentational State Transfer
+  - architectural style inspired by web
+  - noun specifies resource and verbs specify operation on them.
+  - specified no underlying protocol but HTTP 1.1 mostly used
+  - HATEOS : Hypermedia as the engine of application state
+      - representation of resource contains links to other related resources.     - Clients navigate them and discovers new resources and operations.
+      - Decreased coupling between client and server.
+
+  Downsides:
+    - not well suited for low latency.
+    
+Versioning:
+  - semantic versioning : MAJOR.MINOR.PATCH
+  - Tolerant reader, Consumer driven contract.
+  - expand and contract pattern.
+  - For HTTP, Putting version number in request header and also in URI itself.
+  - For gRPC, putting methods in new namespace.
+  
+
+Client library:
+  - useful for service discovery, failure mode, logging etc
+  - client responsible for maintenance and upgrade
+  - may led to Increased coupling between client and server
+
+
+Monitoring:
+  - metrics vs log
+  - metrics : response time, error rate, system metrics
+  - semantic monitoring
+  - correlation IDs
+  - all log information must be collected on a central server.
+  - better to log in a standard json format.    
+  - logging Tools 
+      - logstash: can parse log data and send it to the search server as JSON
+      - Kibana : UI for visualizing, searchin and analyzing the data.
+      - logstash => elastic search => Kibana        
