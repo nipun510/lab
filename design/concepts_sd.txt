@@ -21,6 +21,7 @@ RPC
 REST : REpresentational State Transfer
   - architectural style inspired by web
   - noun specifies resource and verbs specify operation on them.
+  - communication must be stateless and cacheable.
   - specified no underlying protocol but HTTP 1.1 mostly used
   - HATEOS : Hypermedia as the engine of application state
       - representation of resource contains links to other related resources.     - Clients navigate them and discovers new resources and operations.
@@ -28,6 +29,24 @@ REST : REpresentational State Transfer
 
   Downsides:
     - not well suited for low latency.
+
+Domain name system:
+  - domain name => ip address
+  - managed DNS service like CloudFare, Route 53
+      - Weighed Round robing
+      - Latency based
+      - geolocation based
+
+Content delivery network:
+  - closer to user, reduced RTT
+  - needs redirection.
+  - cloudFront
+  - push CDNs
+      - more storage, less traffic
+      - suited for sites with less traffic
+  - pull CDNs
+      - less storage, more traffic
+      - time-to-live TTL
     
 Versioning:
   - semantic versioning : MAJOR.MINOR.PATCH
@@ -39,12 +58,15 @@ Versioning:
 
 Client library:
   - useful for service discovery, failure mode, logging etc
-  - client responsible for maintenance and upgrade
+  - client should be responsible for maintenance and upgrade
   - may led to Increased coupling between client and server
 
 
 Monitoring:
   - metrics vs log
+  - metric tracking:
+      - prometheus,
+      - graphite
   - metrics : response time, error rate, system metrics
   - semantic monitoring
   - correlation IDs
@@ -54,3 +76,23 @@ Monitoring:
       - logstash: can parse log data and send it to the search server as JSON
       - Kibana : UI for visualizing, searchin and analyzing the data.
       - logstash => elastic search => Kibana        
+      
+Testing:
+  - Unit Testing
+  - service Testing
+  - end-to-end Testing
+  - Consumer driven contracts
+  - Canary releasing
+  - Mean time to repair over mean time between failures.
+
+
+Numbers to remember:
+  - Availability:
+      - 99.99% or four 9s : 8.6s
+      - 99.9% or three 9s : 1m 26s
+  - Main memory reference: 100ns
+  - HDD = 30X SSD = 120X memory
+  - Sequential read:
+      - HDD: 30 MB/s
+      - SDD: 1 GB/s
+      - Main memory: 4 GB/s

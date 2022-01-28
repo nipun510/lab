@@ -1,0 +1,72 @@
+objects relation
+  - association
+  - composition
+  - aggregation
+
+
+design patterns
+****
+- singleton:
+    - ensures a class has only one instance
+    - provides a global point of access to the instance.
+    - multithreading handling
+
+- builder:
+    - lets you to construct complex objects step by step.
+    - allows to produce different types and representation of an object using the same construction code.
+    - Avoid ugly contructor calls or telescopic constructor.
+    - builder interface, concrete builders, director construction methods.
+    - example:
+        - House construction
+
+- factory method:
+    - defines an interface for creating an object in a superclass 
+    - but let the subclasses decide which concrete classes to instantiate.
+    - dependency inversion principle.
+    - creator, concreateCreators, product, concreteProducts.
+    - example:
+        - pizza store
+    
+- abstract factory:
+    - lets you produce families of related objects without specifying their concrete classes.
+    - abstract factory, concrete factories, products, concrete products.
+    - client doesn't have to depend upon concrete instance of factories or products, ensures extensibility.
+    - example:
+        - GUI factory
+        - furniture factory
+
+- prototype
+    - lets you copy existing objects without making your code dependent on their classes.
+    - prototype, clone method
+
+
+SOLID Principles:
+  single responsibility principle:
+    - a class should have just one reason to change.
+
+  open/closed principle:
+    - classes should be open for extension but closed for modification
+
+  liskov substitution principle:
+    - subclasses objects should be able to be passed in place of objects of super class without breaking the client code.
+    - points to consider
+       - parameter types and return types.
+       - exceptions
+       - pre-conditions and post-conditions
+       - invariants of superclass
+
+  interface segregation principle:
+    - clients shouldn't be forced to depend on methods they do not use.
+    - interfaces should be narrow enough that client classes don't have to implement behaviours they don't need.
+      
+  dependency inversion priciple:
+    - depend upon abstraction, don't depend upon concrete classes.
+    - high level classes shoudn't depend on low-level classes. Both should depend on abstractions.
+
+Design principles:
+  - Encapsulate what varies
+  - Favor composition over inheritance
+      - can't reduce the interface of the superclass.
+      - overriding methods must have compatible behavior with the base ones. see liskov substitution
+      - breaks encapsulation of the superclass,  tight coupling.
+      - can lead to creation of parallel inheritance hierarchies. For vehicles, cargoType * engineType * navigationType
