@@ -1,3 +1,5 @@
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <iostream>
 #include <string>
@@ -63,3 +65,5 @@ formatter::print(const std::string &s, std::ostream &os = std::cout)
 }
 
 } //namespace util
+
+#endif

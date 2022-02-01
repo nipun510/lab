@@ -1,3 +1,5 @@
+#ifndef  LOGGER_H
+#define  LOGGER_H
 
 #include "tostring.h"
 
@@ -17,7 +19,16 @@ class logger
       WARN,
       ERROR
     };
-    static std::map<level, std::string> levelStr;
+
+    static std::string logLevelStr(logger::level l) 
+    {
+      std::map<logger::level, std::string> levelStr = {
+      {logger::level::DEBUG, "debug"},
+      {logger::level::INFO,  "info"},
+      {logger::level::WARN,  "warn"},
+      {logger::level::ERROR,  "error"}};
+      return levelStr[l];
+    }
 
     static void logPrefix (logger::level l, const std::string &sourceFileName, unsigned sourceLineNo);
 
@@ -29,11 +40,6 @@ class logger
   private:
 };
 
-std::map<logger::level, std::string> logger::levelStr = {
-  {logger::level::DEBUG, "debug"},
-  {logger::level::INFO,  "info"},
-  {logger::level::WARN,  "warn"},
-  {logger::level::ERROR,  "error"}};
 
 inline std::string currTime() 
 {
@@ -44,27 +50,27 @@ inline std::string currTime()
   return currTime;
 }
 
-void
+inline void
 logger::logPrefix (logger::level l, 
            const std::string &sourceFileName, 
            unsigned sourceLineNo) 
 {
-  std::cout <<  (std::string("[") + logger::levelStr[l] +  "][" + (sourceFileName + ":" + toString(sourceLineNo)) + "][" + currTime() + "] "); 
+  std::cout <<  (std::string("[") + logger::logLevelStr(l) +  "][" + (sourceFileName + ":" + stringify::toString(sourceLineNo)) + "][" + currTime() + "] "); 
 }
 
 template<typename T>
-void
+inline void
 logger::log(const T &val) 
 {
-  std::cout <<  toString(val)  << std::endl;
+  std::cout <<  stringify::toString(val)  << std::endl;
 }
 
 template<typename T, typename ...Args>
-void
+inline void
 logger::log(const T &val, const Args& ...args)
 {
-  std::cout << toString(val); 
-  std::cout << toString<Args...>(args...) << std::endl; 
+  std::cout << stringify::toString(val); 
+  std::cout << stringify::toString<Args...>(args...) << std::endl; 
 }
 
 
@@ -81,3 +87,4 @@ logger::log(const T &val, const Args& ...args)
   logger::logPrefix(logger::level::ERROR, __FILE__, __LINE__); \
   logger::log(__VA_ARGS__);
 
+#endif

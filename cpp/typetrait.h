@@ -1,3 +1,6 @@
+#ifndef TYPETRAIT_H
+#define TYPETRAIT_H
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -93,3 +96,4 @@ template<typename T>
 struct isProxy<T, typename T::proxyTag> : std::true_type
 {};
 
+#endif

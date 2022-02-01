@@ -1,3 +1,8 @@
+#ifndef JSON_H
+#define JSON_H
+
+#include "logger.h"
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -5,11 +10,9 @@
 #include <variant>
 #include <sstream>
 #include <type_traits>
+#include <concepts>
+#include <cassert>
 
-/*TODO support initializer_list to default construct array and object value
- * type
- *
- */
 class json{
   public:
     using boolType = bool;
@@ -26,28 +29,41 @@ class json{
                              std::is_same_v<T, double> ||
                              std::is_same_v<T, arrayType> ||
                              std::is_same_v<T, objectType>>{};
+    template<typename T>
+    static inline constexpr bool isValueType_v = isValueType<T>::value;
 
+
+    static constexpr std::nullptr_t nullValue = std::nullptr_t{};
     std::string dump() const;
 
     json() = default;
     explicit json(int val) : _value{val} {}
-    json(bool val) : _value{val} {}
+    explicit json(bool val) : _value{val} {}
+    explicit json(const std::string &val) : _value{val} {}
+    explicit json(const char * val) : json(std::string(val)){}
+    explicit json(const std::nullptr_t &val) : _value{val} {}
+
     template<typename T>
-    json (const std::vector<T> &arr) {
+    json (const std::vector<T> &arr) 
+    {
       _value = arrayType{};
       for (const auto & elem : arr) {
         std::get<arrayType>(_value).push_back(new json(elem));
       }
     }
+    
+
     template<typename T>
-    json (const std::map<std::string, T> &obj) {
+    json (const std::map<std::string, T> &obj) 
+    {
       _value = objectType{};
       for (const auto & elem : obj) {
         std::get<objectType>(_value).insert({elem.first, new json(elem.second)});
       }
     }
-    template<typename T, 
-             std::enable_if_t<isValueType<T>::value, bool> = true>
+
+    template<typename T>
+      requires isValueType_v<T>
     void insert(const std::pair<std::string, T> &elem) 
     {
       objectType::iterator it;
@@ -56,38 +72,54 @@ class json{
       }
     }
 
+
     bool isValueBoolType() const{
       return std::holds_alternative<boolType>(_value);
     }
-#if 0
     bool isValueNullType() const{
       return std::holds_alternative<nullType>(_value);
     }
-#endif
-    bool isValueNumberType() const{
+    bool isValueNumberType() const
+    {
       return isValueIntType() || isValueDoubleType();
     }
-    bool isValueStringType() const{
+
+    bool isValueStringType() const
+    {
       return std::holds_alternative<stringType>(_value);
     }
-    bool isValueArrayType() const{
+
+    bool isValueArrayType() const
+    {
       return std::holds_alternative<arrayType>(_value);
     }
-    bool isValueObjectType() const{
+
+    bool isValueObjectType() const
+    {
       return std::holds_alternative<objectType>(_value);
     }
-    bool isValueIntType() const{
+
+    bool isValueIntType() const
+    {
         return std::holds_alternative<int>(_value);
     }
-    bool isValueDoubleType() const{
+
+    bool isValueDoubleType() const
+    {
         return std::holds_alternative<double>(_value);
     }
-  private:
 
+  private:
     void dumpUtil(std::ostringstream &os) const;
-    std::variant<boolType, int, double, stringType, arrayType, objectType> _value;
+
+    // Data
+    std::variant<boolType, int, double, stringType, nullType, arrayType, objectType> _value;
 };
 
+
+
+
+// inline functions definations
 std::string
 json::dump() const
 {
@@ -99,9 +131,7 @@ json::dump() const
 void
 json::dumpUtil(std::ostringstream &os) const
 {
-  if (isValueBoolType()) {
-    os << (std::get<bool>(_value) == true ? "True" : "False");
-  } else if(isValueIntType()) {
+  if(isValueIntType()) {
     os << std::to_string(std::get<int>(_value));
   } else if(isValueDoubleType()) {
     os << std::to_string(std::get<double>(_value));
@@ -124,19 +154,16 @@ json::dumpUtil(std::ostringstream &os) const
       separator = ", ";
     }
     os << "}";
+  } else if (isValueBoolType()) {
+    os << (std::get<bool>(_value) == true ? "true" : "false");
+  }  else if (isValueStringType()) {
+      os << std::get<std::string>(_value);
+  } else if (isValueNullType()) {
+    os << "null";
   }
-#if 0
-  else if (isValueNullType()) {
-    os << "NULL";
-  } 
-#endif
+  else {
+    assert(false);
+  }
 }
 
-int main() {
-  std::vector<int> arr1{23,23,4,545,4};
-  std::vector<int> arr2{2,3,4,45,4};
-  std::map<std::string, std::vector<int>> obj{{"name1", arr1}, {"name2", arr2}};
-  json j = obj;
-  j.insert(std::make_pair(std::string{"name3"}, 43));
-  std::cout << j.dump();    
-}
+#endif

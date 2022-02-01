@@ -4,4 +4,5 @@ finding two swapped elements in almost sorted array.
   - secondElement is less than the prev element and occurs rightmost.
 
 Topological Ordering:
+  - for directed acyclic graph
   - ordering such that if there is path from a to b then a occurs before b in the ordering.
