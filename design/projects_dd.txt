@@ -1,7 +1,24 @@
 json
+  - interface similar to python json.
+  - std::variant wrapped in jsonValue.
+  - classes
+      - json
+      - jsonValue
+      - jsonEncoder
+  - Design constructs
+      - strategy pattern for jsonEncoder, user can change it at runtime
+      - virtual clone needed, for providing default jsonEncoderImp as well as runtime setting by user.
+  - TODO
+    Reading from and writing to a file
+    # Pretty Printing JSON string back
+    print(json.dumps(person_dict, indent = 4, sort_keys=True))
+
+
+********************************************************************************    
+
+logger
 
 filesystem
 
-logger
 
 queue
