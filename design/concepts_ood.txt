@@ -1,10 +1,15 @@
+Index
+design_patterns
+SOLID_Principles:
+Design_principles:
+
 objects relation
   - association
   - composition
   - aggregation
 
 
-design patterns
+design_patterns
 ****
 - singleton:
     - ensures a class has only one instance
@@ -37,15 +42,57 @@ design patterns
 
 - prototype
     - lets you copy existing objects without making your code dependent on their classes.
-    - prototype, clone method
+    - prototype, prototypeRegistry, clone method
+
+- adapter
+    - converts the interface of a class into another interface the client expect.
+    - Targer<interface>, Adapter, Adaptee
+    - Types
+        - class Adapter
+        - object Adapter
+
+- bridge
+    - use to vary not only your implementations but also you abstractions.
+    - prevents geometric increase in number of subclasses by using composition instead of inheritance.
+    - Remote,  Device
+
+- composite:
+    - lets you compose objects in tree structures and then work with these structures as if they were individual objects.
+    - component, leaf, composite
+    
+- decorator 
+    - attaches additional responsibilities to an object dynamically.
+    - provides a flexible alternative to subclassing for extending functionality.
+    - Component, ConcreteComponent, Decorator, concreteDectors 
+    - Decorator derives from Component as well as compose component.
+    - Example : Design bevarage with types HouseBlend, DarkRost, Decaf, Espresso and Condiment like milk, Mocha, Soy, Whip
+                Design application to writeData with features like encryption, compression etc 
 
 
-SOLID Principles:
+- facade 
+    - provides a simplified interface to a library, a framework, or any other other complex set of classes.
+    - application classes don't depend on  a billion classes provided by complex framework but just on facade.
+    - provides simple interface to the wrapped set of classes.
+
+- flyweight
+    - lets fit more objects into the available amount of RAM by sharing common parts of state.
+    - Instead of keeping all the data in each object.
+    - flyweight and immutability.
+    - flyweight factory
+
+- proxy 
+    - lets you provid a substitute or placeholder for another object.
+    - serviceInterface, proxy, service
+    - manages life cycle of its service object on its own.
+    - Example : introduce lazy initialization and caching to a 3rd party youtube integration library.
+
+SOLID_Principles:
   single responsibility principle:
     - a class should have just one reason to change.
 
   open/closed principle:
     - classes should be open for extension but closed for modification
+    - example strateg pattern.
 
   liskov substitution principle:
     - subclasses objects should be able to be passed in place of objects of super class without breaking the client code.
@@ -62,8 +109,9 @@ SOLID Principles:
   dependency inversion priciple:
     - depend upon abstraction, don't depend upon concrete classes.
     - high level classes shoudn't depend on low-level classes. Both should depend on abstractions.
+    - example factory method pattern
 
-Design principles:
+Design_principles:
   - Encapsulate what varies
   - Favor composition over inheritance
       - can't reduce the interface of the superclass.
