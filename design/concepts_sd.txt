@@ -1,3 +1,5 @@
+interprocess communication
+****************
 synchronous communication
   - request/response
   - RPC and REST
@@ -24,7 +26,8 @@ REST : REpresentational State Transfer
   - communication must be stateless and cacheable.
   - specified no underlying protocol but HTTP 1.1 mostly used
   - HATEOS : Hypermedia as the engine of application state
-      - representation of resource contains links to other related resources.     - Clients navigate them and discovers new resources and operations.
+      - representation of resource contains links to other related resources.     
+      - Clients navigate them and discovers new resources and operations.
       - Decreased coupling between client and server.
 
   Downsides:
@@ -37,17 +40,39 @@ Domain name system:
       - Latency based
       - geolocation based
 
+Load Balancer:
+  - distributes incoming traffic across target servers.
+  - distribution policy
+  - public IP and servers can have private IP.
+
 Content delivery network:
+  - proxy servers geographically distributed
   - closer to user, reduced RTT
   - needs redirection.
   - cloudFront
   - push CDNs
+      - can specify which content, when that content will expire and when it has to be updated.
       - more storage, less traffic
-      - suited for sites with less traffic
+      -? preffered for sites with low traffic
   - pull CDNs
+      - cache response until it expires.
       - less storage, more traffic
-      - time-to-live TTL
+      -? preffered for sites with high traffic
     
+API gateway:
+  - Rate limiting
+  - SSL termination
+  - authentication
+  - IP whitelisting
+  - servicing static content
+
+Consistent hashing
+  - on average k/n keys needs to be remapped on resizing of hash table.
+  - hash space and hash ring
+  - hash servers and hash keys
+  - virtual nodes
+  - nodes addition and removal
+
 Versioning:
   - semantic versioning : MAJOR.MINOR.PATCH
   - Tolerant reader, Consumer driven contract.
@@ -55,11 +80,6 @@ Versioning:
   - For HTTP, Putting version number in request header and also in URI itself.
   - For gRPC, putting methods in new namespace.
   
-
-Client library:
-  - useful for service discovery, failure mode, logging etc
-  - client should be responsible for maintenance and upgrade
-  - may led to Increased coupling between client and server
 
 
 Monitoring:
@@ -85,6 +105,15 @@ Testing:
   - Canary releasing
   - Mean time to repair over mean time between failures.
 
+Client library:
+  - useful for service discovery, failure mode, logging etc
+  - client should be responsible for maintenance and upgrade
+  - may led to Increased coupling between client and server
+
+HOW_TO_SCALE
+-load balancer
+- database replication
+- caching
 
 Numbers to remember:
   - Availability:
@@ -96,3 +125,5 @@ Numbers to remember:
       - HDD: 30 MB/s
       - SDD: 1 GB/s
       - Main memory: 4 GB/s
+  - HTP codes
+      - 429: too many requests

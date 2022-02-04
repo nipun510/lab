@@ -1,0 +1,16 @@
+
+hash function
+  - fixed length output
+  - efficiency
+  - deterministic
+
+cryptographic hash function:
+  - pre-image resistance
+  - second pre-image resistance
+  - collision resistance
+
+Uses
+  - document integrity
+  - password storage
+  - unique id
+  - proof of work
