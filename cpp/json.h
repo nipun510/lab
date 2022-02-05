@@ -115,10 +115,10 @@ class jsonValue
     bool isValueIntType() const { return std::holds_alternative<int>(_value); }
     bool isValueDoubleType() const { return std::holds_alternative<double>(_value); }
 
-    jsonArrayConstIter arrayConstBegin() const{ return std::get<arrayType>(_value).cbegin(); }
-    jsonArrayConstIter arrayConstEnd() const{ return std::get<arrayType>(_value).cend(); }
-    jsonObjectConstIter objectConstBegin() const { return std::get<objectType>(_value).cbegin(); }
-    jsonObjectConstIter objectConstEnd() const { return std::get<objectType>(_value).cend(); }
+    jsonArrayConstIter arrayValueContBegin() const{ return std::get<arrayType>(_value).cbegin(); }
+    jsonArrayConstIter arrayValueConstEnd() const{ return std::get<arrayType>(_value).cend(); }
+    jsonObjectConstIter objectValueConstBegin() const { return std::get<objectType>(_value).cbegin(); }
+    jsonObjectConstIter objectValueConstEnd() const { return std::get<objectType>(_value).cend(); }
     jsonArrayIter arrayBegin() { return std::get<arrayType>(_value).begin(); }
     jsonArrayIter arrayEnd() { return std::get<arrayType>(_value).end(); }
     jsonObjectIter objectBegin() { return std::get<objectType>(_value).begin(); }
@@ -136,6 +136,16 @@ class jsonValue
       assert(isValueObjectType());
       if (isValueObjectType()) {
         std::get<objectType>(_value).insert(std::make_pair(elem.first, new jsonValue(elem.second)));
+      }
+    }
+
+    template<typename T>
+      requires isValueType_v<T>
+    void append(const T &elem) 
+    {
+      assert(isValueArrayType());
+      if (isValueArrayType()) {
+        std::get<arrayType>(_value).push_back(new jsonValue(elem));
       }
     }
 
@@ -248,7 +258,7 @@ jsonEncoderImp::dumpUtil(const jsonValue *value,
   } else if (value->isValueArrayType()) {
     os << "[";
     const char* separator = "";
-    for (auto it = value->arrayConstBegin(); it != value->arrayConstEnd(); ++it) {
+    for (auto it = value->arrayValueContBegin(); it != value->arrayValueConstEnd(); ++it) {
       os << separator << " ";
       dumpUtil(*it, os);
       separator = ", ";
@@ -257,7 +267,7 @@ jsonEncoderImp::dumpUtil(const jsonValue *value,
   } else if (value->isValueObjectType()) {
     os << "{";
     const char* separator = "";
-    for (auto it = value->objectConstBegin(); it != value->objectConstEnd(); ++it) {
+    for (auto it = value->objectValueConstBegin(); it != value->objectValueConstEnd(); ++it) {
       os << separator << "{" << it->first << ": ";
       dumpUtil(it->second, os);
       os << "}";
