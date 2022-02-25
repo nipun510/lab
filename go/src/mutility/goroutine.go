@@ -1,4 +1,4 @@
-package main
+package mutility
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func spinner(delay time.Duration) {
   }
 }
 
-func main() {
+func runGoroutineTest() {
   const n = 45
   go spinner(100*time.Millisecond)
   fibN := fib(n)

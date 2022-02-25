@@ -1,4 +1,5 @@
-package main
+package mutility
+
 import (
   "log"
   "flag"
@@ -9,22 +10,6 @@ import (
   "encoding/json"
 )
 
-var (
-    WarningLogger *log.Logger
-    InfoLogger    *log.Logger
-    ErrorLogger   *log.Logger
-)
-
-func loggerInit() {
-    file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    InfoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-    WarningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-    ErrorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-}
 
 type response struct {
   Location string
@@ -79,8 +64,7 @@ func printInfo() {
   println(cmd + " time --port 8000 --location US/Eastern")
 }
 
-func main() {
-  loggerInit()
+func TestServer() {
 
   helpCommand := flag.NewFlagSet("help", flag.ExitOnError)
 

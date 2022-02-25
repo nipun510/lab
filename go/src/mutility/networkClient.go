@@ -1,4 +1,4 @@
-package main
+package mutility
 
 import (
   "net"
@@ -13,7 +13,7 @@ type Response struct {
   Time string
 }
 
-func main() {
+func TestNetworkClient() {
   var port string
   if (os.Args[1] == "--port") {
     port = os.Args[2]

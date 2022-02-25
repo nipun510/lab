@@ -1,4 +1,4 @@
-package main
+package mutility
 import (
   "fmt"
   "net/http"
@@ -9,7 +9,7 @@ func hello(w http.ResponseWriter, req *http.Request) {
   fmt.Fprintf(w, time.Now().Format("11:02:23"))
 }
 
-func main() {
+func TestHTTP() {
   http.HandleFunc("/hello", hello)
   http.ListenAndServe(":8000", nil)
 }

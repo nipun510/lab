@@ -1,4 +1,4 @@
-package main
+package mutility
 
 import (
 	"fmt"
@@ -113,7 +113,7 @@ func (this *RbTree) remove(v *Node) {
   u := this.BSTReplace(v)
   uvBlack := (u == nil || u.color == BLACK) && v.color == BLACK
   //case when v is leaf node
-  if v.left == nil && v.right == nill {
+  if v.left == nil && v.right == nil {
     if v == this.root {
       this.root = nil
       return
@@ -320,7 +320,7 @@ func (this *RbTree) contains(data Data) (bool) {
 }
 
 
-func main (){
+func TestRBTree (){
   rbTree := RbTree{nil}
   rbTree.insert(11)
 	rbTree.insert(18)
