@@ -1,7 +1,0 @@
-Design Car rental System
-  - User can search for available cars
-  - Reserve fo specified dates
-  - Schema Design, Sql queries
-
-Design parking lot
-
