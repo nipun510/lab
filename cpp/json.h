@@ -23,6 +23,7 @@ class jsonEncoder
     virtual std::string dumps(const json *jsonObj) const = 0;
 
     virtual jsonEncoder * clone() = 0;
+    virtual ~jsonEncoder() = default;
 };
 
 class jsonEncoderImp  : public jsonEncoder
