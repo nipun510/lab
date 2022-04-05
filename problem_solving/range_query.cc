@@ -30,6 +30,8 @@ public:
         auto insertedIt = _ranges.insert({first, second}).first;
         bool erasePrevIt = false;
         bool eraseNextIt = false;
+        // cases in which there is no overlapping, still newly inserted rang can be merged
+        // with left range or right range.
         auto prevIt = insertedIt == _ranges.begin() ? _ranges.end() : std::next(insertedIt, -1);
         if (prevIt != _ranges.end()) {
             if (prevIt->second + 1 == insertedIt->first) {
@@ -54,10 +56,9 @@ public:
     
     bool queryRange(int left, int right) {
         auto overlappingRanges = getOverlappingRanges(left, right, 1);
-        if (!overlappingRanges.empty()) {
-            if (overlappingRanges[0]->first <= left && overlappingRanges[0]->second >= (right - 1)) {
-                return true;
-            }
+        if (overlappingRanges.size() == 1 &&
+            isContainedOverlapping(left, right, overlappingRanges[0]) {
+              return true;
         }
         return false;
     }
