@@ -1,27 +1,137 @@
-Example : whatsApp
+Step1 : Understand the problem and establish design scope
+  - Functional requirements
+  - Non functional requirements
+  - Extended requirements
+Step2 : Propose high level design and get buy in
+Step3 : Deep dive
+  - Capacity estimation and Constraints
+  - Scalability
+     - Load balancing
+     - CDN
+     - caching
+     - partitioning/ sharding
+     - replication
 
-Functional Requirements:
-  - One to one Chat
-  - group chat
-  - Should support Text, images, videos
-  - send, delivered and read receipt
-  - Last seen
+******************************************************************************************************************
+Video streaming service
+  Example: youtube, netflix
+  Functional Requirements:
+    - upload a video
+    - search a video by title
+    - view a video/ sharing a video
+    - views/like/dislike
+    - comment
+  
+  Design:
+    Database:
+      - User Database
+          - userId|Name|email|age|regId
+      - Metadata Database
+          - video
+              - videoId|Title|Description|Size|Thumbnail|Uploader|likes|dislikes|views
+          - comment    
+            - CommentId|VideoId|UserId|Text|TimeOfCreation
+    Storage:
+      - Video and Thumbnail storage
 
-Design:
+    videoSource => Source Inspection => ? accept source => parallet video encoding + packaging + deployment
+    video inspection
+      for data corruption in transmission and storage
+      video broken into multiple chunks for parallel inspection 
 
-Why need websocket
-  Two way communication. HTTP supports client server mode of communication.
+    video endcoding into multiple formats
+      - chunks of source file for parallelization.
+      - encoding into a number of codec profiles to support multiple devices.
+      - for different bandwidths from 0.5Mbps to 100+Mbps
+    video deduplication
+      - algorithms to detect if the video or part of it is already present.
+
+******************************************************************************************************************
+New Feed system
+  Design:
+  Services:
+    - NewsFeedGeneration service
+        - asynchronous or offline mode
+        - generates mapping of userId and (NewsfeedId, Newsfeed) + lastGenerated
+        - stored in memory/cache
+    - NewsFeedPublishing service
+        - when users refresh/reload
+        - long polling
+
+  Fanout Approach
+    - Fanout on write or push model
+    - Fanout on load or pull model
+        - For posts of celebrity users 
+    - Hybrid approach
+
+    Data model
+      UserDB
+        - NewsFeedIdUserId Table : newsFeedId|userId
+        - User Table: userId|userName|emailId|DOB|lastLogin|created
+        - Friends Table: userId1|userId2
+      NewsFeed DB
+        - NewsFeed: newsFeedId|userId|content|creationTime
 
 
+*******************************************************************************************************************
+Chat System
+  Example : whatsApp, facebook messenger
+  
+  Functional Requirements:
+   - mobile app or a web app or both
+   - One to one Chat and group chat
+   - support of Text, images, videos
+   - message size limit
+   - send, delivered and read receipt
+   - Online status and Last seen
+   - encryption and storage
+   - DAU
+  
+  Design:
+   - API servers
+     - userConnection service
+       - user web socket connection info
+     - user service  
+     - Message service
+     - Group service
+   - Chat service
+   - Group Chat service
+   - Presence service
+     - keeps track of user online status
+   - Notification service
+   
+  HTTP long polling vs websocket
+    Why websocket
+     - asynchronous updates from server to client.
+     - low latency 2 way communication
+     - persistent connection.
+
+  Caching of user-chat server in each chat server itself
+  Make copies of group message and sending them similar to 1-1 message vs handling group message separately.   
+
+  message ordering
+   - each user has its own view of ordering of messages irrespective of global ordering.
+  service discovery
+   - client -> load balancer -> API server -> zookeeper -> chat server
+   - Service discovery based on predefined criteria like geographical location, server capacity through Zookeeper.
+  
+
+***********************************************************************************************************************  
+Notification system
+  - Mobile push notification
+  - SMS message
+  - Email
+
+**********************************************************************************************************************
 Rate limiter
-- Algorithms
-    - token bucket
-    - leaking bucket
-        - bucket size
-        - outflow rate
-    - fixed window
-    - slinding window log
-    - slinding window counter
-- distributed environment
-    - race condition
-    - synchronization
+  - Algorithms
+      - token bucket
+      - leaking bucket
+          - bucket size
+          - outflow rate
+      - fixed window
+      - slinding window log
+      - slinding window counter
+  - distributed environment
+      - race condition
+      - synchronization
