@@ -1,5 +1,32 @@
-Split Array Largest Sum
-robot-room-cleaner:
-  - https://leetcode.com/problems/robot-room-cleaner/
-  - APIs: move(), turnLeft(), turnRight() and clean()
-  - clean the entire grid.
+links
+  - conceptual problems list
+  - leetcode featured lists
+  - gfg curated lists
+  - hackerrank interview preparation kit
+
+
+conceptual:
+  - container-with-most-water:
+      - https://leetcode.com/problems/container-with-most-water/
+      - solved, greedy, two pointer
+      - between leftptr and rightptr, one having smaller height is moved
+  - trapping-rain-water:
+        - https://leetcode.com/problems/trapping-rain-water
+        - solved, monotonic stack
+
+        
+tricky:      
+  - spiral-maxtrix
+      - https://leetcode.com/problems/spiral-matrix/
+      - minRow, maxRow, minCol, maxCol
+      - avoid overlap
+
+
+tried-but-unsolved:
+  - robot-room-cleaner:
+      - https://leetcode.com/problems/robot-room-cleaner/
+
+
+todo:
+  - reverse-words-in-a-string
+      - https://leetcode.com/problems/reverse-words-in-a-string/

@@ -1,50 +1,72 @@
 
-- sorting
-- binary search
-- greedy
-- dp
-- divide and conquer
-- BIT tree
-- segment tree
+Points to remember:
+  - finding two swapped elements in almost sorted array.
+      - firstElement is greater than the next element and occurs leftmost.
+      - secondElement is less than the prev element and occurs rightmost.
+   
+  - Topological Ordering:
+      - for directed acyclic graph
+      - ordering such that if there is path from a to b then a occurs before b in the ordering.
+   
+  - slow ptr vs fastPtr approach 
+      - used for cycle detection in linked list 
+      - relative distance between them decreases by 1 after each step once both enter the cycle.
+            
+  - when fifo or lifo is needed along with ability to insert/erase any element:
+      - a list to maintain lifo or fifo order.
+      - an unordered_map to store the mapping between the element and the position in the list.
+      - used in LRU cache design.
 
-- string algorithms
-    - Trie
-        - space complexity: O(alphabet_size * avg_key_length * N) where N is no of keys
-        - Insertion, deletion, search all O(N)
-        - Radix tree or PATRICIA tree:
-            - compressed version of a trie.
-    - suffix array
-    - suffix tree
-        - ukkonen's algorithm
-        - complexity is O(n) which otherwise could be O(n^2)
-        - variables: remaining, end, active Node, active edge, active length.
-        - skip count: edge label compression
-        - remaining denotes how many suffixes needs to be created.
-        - global end for leaves
-        - suffix link: for every internal node v with path t@, there is another internal node sv with path @, which is suffix link of v.
-        - rule 1 extension
-            - end is incremented by 1
-            - remaining is increated by 1
-        - rule 2 extension
-            - when a suffix doesn't exist.
-            - remaining is decremented if a leaf node is created.
-            - suffix link created if an internal node is created, first pointing to root then to the internal node created next in this phase.
-            - if active node is root, decrement active length by 1 and increment active edge by 1.
-            - if active node isn't root, follow active link of the active node and continue with the current phase.
-            - continues current phase until remaining is zero.
-        - rule 3:
-            - when a suffix already exists.
-            - if jumping internal node, reset active points.
-            - else active length incremented by 1
-            - showstopper, start the next phase.
+  - To check if val*x will cause integer overflow, check if INT_MAX/x is less than or greater that val.    
+  - To check if (val + x) will cause integer overflow, check if (INT_MAX - x) is less than or greater that val.    
 
-    - KMP algorithm
-    - Z algorithm
-
-- union-find algorithm    
+union-find algorithm:    
   - path compression
   - union by size/rank
   - time complexity : 
       - amortized complexity: O(@(n)) where @(n) is inverse Ackermann function which grows very slowly. 
       - worst: log(n)
   - imp: union_find.cc    
+
+trie:
+  - space complexity: O(alphabet_size * avg_key_length * N) where N is no of keys
+  - Insertion, deletion, search all O(N)
+  - Radix tree or PATRICIA tree:
+        - compressed version of a trie.
+
+Disjoint intervals/ranges:
+  - ordered set i.e std::set<std::pair<int,int>> as an alternative to segment tree
+  - insertion O(logn) : may trigger merge
+  - find O(logn)
+  - deletion O(logn)
+  - A given range can have following overlapping with existing ranges.
+        - left overlapping, right overlapping, containing overlapping, contained overlapping
+    - eg: data-stream-as-disjoint-intervals, range-module
+    - imp: range_query.cc    
+
+
+suffix tree:
+  - ukkonen's algorithm
+  - complexity is O(n) which otherwise could be O(n^2)
+  - variables: remaining, end, active Node, active edge, active length.
+  - skip count: edge label compression
+      - remaining denotes how many suffixes needs to be created.
+      - global end for leaves
+      - suffix link: for every internal node v with path t@, there is another internal node sv with path @, 
+                     which is suffix link of v.
+      - rule 1 extension
+          - end is incremented by 1
+          - remaining is increated by 1
+      - rule 2 extension
+          - when a suffix doesn't exist.
+          - remaining is decremented if a leaf node is created.
+          -suffix link created if an internal node is created, first pointing to root then 
+            to the internal node created next in this phase.
+          - if active node is root, decrement active length by 1 and increment active edge by 1.
+          - if active node isn't root, follow active link of the active node and continue with the current phase.
+          - continues current phase until remaining is zero.
+      - rule 3:
+          - when a suffix already exists.
+          - if jumping internal node, reset active points.
+          - else active length incremented by 1
+          - showstopper, start the next phase.
