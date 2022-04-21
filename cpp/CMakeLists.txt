@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 project(lab)
 set(CMAKE_CXX_STANDARD 20)
 
+add_subdirectory(json)
+
 add_executable(toStringTest    toStringTest.cc)
 add_executable(observerTest    observerTest.cc)
 add_executable(detailTest      detailTest.cc)
@@ -10,6 +12,8 @@ add_executable(typetraitTest   typetraitTest.cc)
 add_executable(utilTest        utilTest.cc)
 add_executable(loggerTest      loggerTest.cc)
 add_executable(jsonTest        jsonTest.cc)
+target_link_libraries(jsonTest PUBLIC json)
+target_include_directories(jsonTest PUBLIC "${PROJECT_SOURCE_DIR}/json")
 
 enable_testing()
 
