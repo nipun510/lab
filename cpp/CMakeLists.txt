@@ -5,18 +5,20 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(json)
 
+list (APPEND INCLUDES "${PROJECT_SOURCE_DIR}/json")
+
 add_executable(toStringTest    toStringTest.cc)
 add_executable(observerTest    observerTest.cc)
 add_executable(detailTest      detailTest.cc)
 add_executable(typetraitTest   typetraitTest.cc)
 add_executable(utilTest        utilTest.cc)
 add_executable(loggerTest      loggerTest.cc)
+
 add_executable(jsonTest        jsonTest.cc)
 target_link_libraries(jsonTest PUBLIC json)
-target_include_directories(jsonTest PUBLIC "${PROJECT_SOURCE_DIR}/json")
+target_include_directories(jsonTest PUBLIC "${INCLUDES}")
 
 enable_testing()
-
 add_test(NAME logger COMMAND loggerTest)
 set_tests_properties(logger PROPERTIES PASS_REGULAR_EXPRESSION "info")
 set_tests_properties(logger PROPERTIES PASS_REGULAR_EXPRESSION "warn")
