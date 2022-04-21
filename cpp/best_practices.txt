@@ -1,0 +1,277 @@
+########### Goal ##################
+- know enough but not everything.
+
+
+cpp stl
+******
+  std::set::insert
+    returns std::pair<iterator, bool>
+  std::priority_queue:
+    - std::priority_queue<int, std::vector<int>, std::greater<int>> for min heap implementation
+    - top(), push(), pop()
+    - lambda can be passed in constructor for comparision. 
+
+template interface rule:
+  - use function objects to pass operation to algorithms
+      - lambdas generate function objects.
+  - Use function templates to deduce class template argument types(where feasible)
+  - use template aliases to simplify notation and hide implementation details.
+  - require template arguments to be atleast semiregular.
+  - if your compiler does not support concepts fake them with enable_if.
+  - wherever possible, avoid type erasure.
+
+template definition rule:  
+  - minimize a template's context dependencies.
+      - template typically appear in header file so their context dependencies are more vulnerable.
+  - don't over-parametrize members
+  - place non-dependent class template members in a non-templated base class
+      - factor parameter independent code out of class templates.
+      - templates generate multiple classes and multiple functions, so any template 
+        code not dependent on a template parameter causes code bloat.
+  - In derived class templates, refer names in base class templates 
+      - via a "this->" prefix,
+      - via using declarations, or 
+      - via an explicit base class qualification. 
+      - This is because compiler has no way of determining base class members when it encounters derived
+        because base class is also templated.
+
+template and hierarchy rule:        
+  - don't naively templatize a class hierarchy
+
+template type deduction:
+  - case 1: paramType is a reference or pointer but not a universal reference.
+      - template<typename T>
+        void f(T& param) // paramType = "T &"
+      - reference-ness is ignored during type deduction.  
+      - const int &rx = x;
+        f(rx); // T is const int; paramType is "const inst &"
+  - case 2: paramType is a universal reference.
+     - template<typename T>
+       void f(T&& param) // paramType = "T &&"
+     - if expr is an lvalue, both T and paramType are deduced to be lvalue reference, 
+     - if expr is an rvalue, "case 1" rule applies.
+     - cont int& rx = x;
+       f(rx) // T is "const int&", paramType is "const int&"
+       f(27) // T is "int", paramType is "int&&"
+  - case 3: paramType is neither a pointer nor a reference.
+    - template<typename T>
+      void f(T param); 
+    - ignore the reference part and ignore the const.  
+    - const int& rx = x;
+      f(rx); // T's and parmType are both int
+  - compilers can't deducre template type parameters from return types alone.    
+
+inline:
+  - in c++17, static data member can be defined within its class by using keyword inline.
+
+
+misc:
+  - distinguish between () and {} when creating objects.
+      - prevents narrowing conversion.
+      - immune to c++'s most vexing parse "Widget w()". "Widget w{}" is fine.
+      - "int x{0}", "int y = 0" fine for in-class intialization but not "int x(0);"
+      - uncopyable objects like std::atomic can be initialized using brackes and prantheses but not using "="
+      - empty braces mean no arguments, not an empty std::initializer_list, calls default constructor.
+      - constructors should be designed such that overload called isn't affected weather clients 
+        use parentheses or braces unlike std::vector.
+  - prefer nullptr to 0 and NULL.    
+      - overloading on pointer and integral types could lead to surprises.
+      - When 0 or NULL is passed as a template argument, they are deduced as integral type 
+        whereas nullptr is deduced as std::nullptr_t. 
+      - improves code clarity when used with auto variables.
+      - std::nullptr_t implicity converts to all pointer types.
+  - Use multiple inheritance to represent multiple distinct interfaces.
+      - Interface segregaion principle.
+      - Not all classes will necessarily support all interfaces, and not all callers will necessarily 
+        want to deal with all operations.
+  - distinguish between implementation heritance and interface inheritance.
+      - provides stable interfaces with interface hierarchies and code reuse with implementation inheritance.
+      - implementation details in an interface make the interface brittle.
+  - avoid trivial getters and setters.
+      - adds no semantic value, the data item could just as well be public.
+
+smart pointers:
+  - use std::unique_ptr for exclusive ownershipe, std::shared_ptr for shared ownership and 
+    std::weak_ptr for std::share_ptr like pointers that can dangle.
+
+concurrancy:
+  - prefer task based-programming std::async to thread-based std::thread.
+      - std::thread APIs offers no direct way to return values from asynchronously run functions, also
+        if thoses functions throw exception, the program is terminated
+      - std::async when called in this form, doesn't guarantee that it will create a new software thread.  
+      - no need for manual thread management like oversubscripton, load balancing among cores, thread creation/destrunction.
+  - std::aync launch policy:
+      - std::launch::async:
+          - f must be run asynchronously i.e on a different thread.
+      - std::launch::deferred:
+          - f may run only when get or wait is called on the future returned by std::async. The caller will block util f finishes running.
+      - default policy permits f to be run either asynchronously or synchronously.    
+  - vectorization:
+      - technique for executing a number of tasks concurrently without introducing explicit synchronization.
+
+concept:
+  - specify concepts for all template arguments.
+  - whenever possible use standard concepts.
+      void sort(sortable auto &s); 
+  - avoid concepts without meaningful semantics.    
+      - concepts are meant for semantic notations such as "a numberer", "a range".
+      - require a complete set of operation for a concept like Arithmetic, Comparable
+
+
+template and hierarchy:
+  - do not naively templatize a class hierarchy
+      - templating a class hierarchy that has many functions, espectially many virtual functions can lead to code bloat.
+  - do not declare a member function template virtual.
+  - use a non-templated core implementation to provide an ABI-stable interface.
+      
+iterator or reference invalidation:
+- vector:
+    - insert: if reallocation, it will invalidate all iterators, pointers or refrences otherwise iterator or references
+              before the point of insertion will remain valid. 
+    - erase : will invalidate iterators and references at or after the point of erase.
+- list:
+    - insert: no invalidation
+    - erase: only invalidates the iterator and refrences of deleted element.
+- deque:
+    - insert: An insertion in the middle invalidates all the iterators and references to elements.
+              An insertion at either end invalidates all the iterator but has no effect on validity of references.
+    - erase: An erase operation of last element invalidates past the end iterator.
+             An erase operation of first element invalidates iterators or references pointed to it.
+             Otherwise, all iterators and references are invalidated.
+- set/map:
+    - insert: no invalidation
+    - delete: invalidates only the iterators and references of the erased element.
+
+copy elision:
+  - fno-elide-constructors is needed to prevent copy elision before c++17
+  - Without NRVO, source construction -> temprory move construction + source destruction + target move construction +
+    temprory destruction -> target destruction
+  - with NRVO, source construction -> target/source destruction
+  - from c++17, copy elision is guaranteed.
+
+casting:
+  - static_cast:
+      - no run time check.
+      - used commonly for implicit conversion.
+      - can be used whey you know that you refer to an object of a specific type and thus a check would be unnecessary.
+  - dynamic_cast:
+      - used when you don't know what the dynamic type of the object is.
+      - returns a null pointer when incorrectly type-casted in case of pointer.
+      - throws a 'bad_cast' exception when incorrectly type-casted in case of reference.
+  - reinterpret_cast:
+      - to fore the pointer conversion.
+
+
+operator overloading:
+  - provides intuitive interface to class users.
+  - define operators primarily to mimic conventional usage.
+  - copy assignment, move assigment:
+      - non-virtual, return non-const &
+      - test for self-assignment, and associated cost consideration
+      - value semantics vs pointer semantic
+  - prefix and postfix (++i vs i++)
+      - prefix accepts dummy parameter and return refrence
+      - postfix return original copy by value
+  - avoid overloading short-ciruiting operators as they will no short-circuit and evaluate both.    
+  - avoid implicit conversion operators to avoid surprises.
+  - maintain the usual identities:
+      - x = y => x == y
+      - x < y and y < z => x < z
+  - use non-member functions for symmetric operators.    
+
+lambda:
+  - prefer capturing by reference in lambdas that will be used locally, including passed to algorithms.
+  - avoid default capture modes.
+  - prefer lambdas to std::bind.
+  - if you feel like overloading a lambda, use a generic lambda.
+      - cannot overload two different lambdas with the same name
+  
+
+constructor:
+  - Define a constructor if a class has an invariant.
+  - A constructor should create a fully intialized object.
+      - If a constructor cannot construct a valid object, throw an exception
+  - Prefer default constructors to be simple and non throwing.    
+  - By default, declare single-argument constructor explicit.
+  - Prefer in-class intializers to member initializer in constructors for constant initializers.
+  - Prefer intitilization to assigment in constructor
+  - Use delegating constructors to represent common actions for all constructors of a class.
+  - Use inherting constructor to import constructor into a derived class that doesn't need further initialization.    
+
+
+concrete class:
+  - for value-like type, consider providing a nonexcept swap function.    
+  - prefer concrete types over class hierarchies.
+      - more simpler
+      - no allocation/deallocation overhead
+      - no runtime overhead to perform indirection
+  - Ensure that a copyable class has a default constructor.
+      - semiregular: default initializable and copyable
+  - make concrete types regular    
+      - default initializable
+      - copyable
+      - equality comparable
+  - Don't make data members const or references
+      - with the default functionality they prevent default copy assignment and moving.
+      - if you need a member to point to something use a pointer(raw or smart, 
+         and gsl::not_null if it shouldn't be null) instread of a reference.
+      - same behavior can be expressed with non-public non-const members wth const accessor member functions.
+  - Ensure all non-const data members have the same access level
+      - To avoid the confusion that is the type maintains an invariant or simply a collection of values.
+  
+polymorphic class:
+  - should suppress public copy/move and assignment
+      - To avoid accidental slicing.
+      - either delete them or make them protected.
+  - For making deep copies of polymorphic classes 
+      - prefer a virtual clone function instead of public copy constructor/assignment.    
+      - covariant return type
+  - Don't call virtual functions in constructors and destructors.    
+  - Use a factory function if you need "virtual behaviour" during intialization.    
+      - templated unquie_ptr, smart_ptr return type, static create, only in base
+      - a protected token to prevent constructor to be called publicly.
+  - make == symmetric with respect to operand types and nonexcept.
+      - applies to all the usual comparision operators !=, <, <=, > and >=
+  - Beware of == on base classes.   
+  - create an overload set for a derived class and its bases with using.
+  - Do not provide different default arguments for a virtual function and an overrider.
+
+
+Base class:
+  - A base class destructor should be either be made:
+      - public if virtual 
+      - protected if non-virtual.
+  - Prefer virtual functions to casting.
+  
+Idioms:
+  - Non-virtual Interface:
+      - To modularize common before and after code fragements(eg invariant checking, acquiring/releasing locks)
+        for an entire class hierarchy at one location.
+      - non-virtual functins are made part of interface and virtual functions are made private.  
+      - clients call private virtual functions indirectly through public non-virtual member functions.
+      - variation of template method pattern
+  - Attorney-client
+      - control the granularity of access to the implementation details of a class.
+      - methods in attorney are inline, static.
+      - Attorney determines which other classes, member functions or free functions get access to it by declaring them friend.
+  - Requiring/prohibiting heap bases objects.    
+      - To allow only heap-allocated objects to be created, make destructor non-public.
+      - To prohibit heap-allocated objects to be created, make new operator non-public.
+  - clear-and-minimize:
+      - After call to clear, size() returns zero but leaves capacity unchanged. 
+      - shrint_to_fit is a non-binding request to reduce capacity to size.
+      - std::vector<T>.swap(v) needed to clear and make capacity zero.
+  - coercion by Member Template    
+      - To allow  class template to participate in the same implicit type conversion as its paramaterizing types
+      - write copy constructor and assignment operator to enable this conversion mostly for ptr type.
+  - predefined owner classes
+      - Make constructor and destructor of owned class non-public.
+      - Make owned classes friend of owning class.
+  - non-vitrual  hierarchies    
+      - base class is not polymorphic. 
+      - base class contains pointer variants specific to each derived class data as well as common data.
+      - Destructor of base class is made protected.
+      - since a container class stores stack allocated base class object, so
+        derived classes don't contain any data member. 
+      - Invocation of derived classes constructors and destructors made an error.  
+

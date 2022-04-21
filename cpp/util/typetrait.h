@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+
+
+
+// some dummy type traits implementations
 template<typename T>
 struct is_void : std::is_same<void, std::remove_cv_t<T>> {};
 
@@ -35,37 +39,27 @@ namespace detail {
 template<typename T>
 struct is_class : decltype(detail::test<T>(nullptr)) {};
 
-
-
-
 template<typename T>
 struct is_member_pointer_helper : std::false_type {};
-
-
 template<typename T, typename U>
 struct is_member_pointer_helper<T U::*> : std::true_type {};
-
 template<typename T>
 struct is_member_pointer : is_member_pointer_helper<std::remove_cv_t<T>> {};
 
 template<typename T>
 struct is_member_function_pointer_helper : std::false_type {};
-
 template<typename T, typename U>
 struct is_member_function_pointer_helper<T U::*> :  std::is_function<T>{};
-
 template<typename T>
 struct is_member_function_pointer : is_member_function_pointer_helper<std::remove_cv_t<T>> {};
 
-
-
 template<typename, typename = void>
 struct has_type_member : std::false_type{};
-
 template<typename T>
 struct has_type_member<T, std::void_t<typename T::type>> : std::true_type {};
 
-
+// sfinae based method detection on a type
+// concept can be used c++20 onward.
 template<typename T>
 class has_toString 
 {
@@ -80,20 +74,18 @@ class has_toString
 };
 
 
+// tag can be defined in cases, and can be used to 
+// identify classes based on tag at compile time
 struct realClass {};
-
 struct proxyClass 
 {
   using proxyTag = void;
 };
 
 template<typename T, class Enable = void>
-struct isProxy : std::false_type
-{
-};
+struct isProxy : std::false_type {};
 
 template<typename T>
-struct isProxy<T, typename T::proxyTag> : std::true_type
-{};
+struct isProxy<T, typename T::proxyTag> : std::true_type {};
 
 #endif

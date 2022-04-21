@@ -1,5 +1,5 @@
-#include "logger.h"
-#include "detail.h"
+#include <util/logger.h>
+#include <util/detail.h>
 
 #include <tuple>
 #include <algorithm>
@@ -12,24 +12,24 @@ At the very outset(at compile time), we have a list of classes that
 need to be observed`in subject::_observedClasses
 */
 template<typename C>
-struct memberTag;
+struct fieldEnum;
 
 class observedClass1;
 class observedClass2;
 
-enum class memberTag1
+enum class fieldEnumClass1
 {
   A,
   B
 };
 
 template<>
-struct memberTag<observedClass1>
+struct fieldEnum<observedClass1>
 {
-  using type = memberTag1;
+  using type = fieldEnumClass1;
 };
 
-enum class memberTag2
+enum class fieldEnumClass2
 {
   C,
   OBJS
@@ -37,9 +37,9 @@ enum class memberTag2
 
 
 template<>
-struct memberTag<observedClass2>
+struct fieldEnum<observedClass2>
 {
-  using type = memberTag2;
+  using type = fieldEnumClass2;
 };
 
 enum eventType{
@@ -58,9 +58,10 @@ class subject
 
   using oc1 = observedClass1;
   using oc2 = observedClass2;
-  using of1 = typename memberTag<observedClass1>::type;
-  using of2 = typename memberTag<observedClass2>::type;
+  using of1 = typename fieldEnum<observedClass1>::type;
+  using of2 = typename fieldEnum<observedClass2>::type;
   using classList = std::tuple<oc1, oc2>;
+  // needed for notifying observers based on certain events
   using event = eventType;
 
   void subscribe(observer *obs) {
@@ -75,7 +76,7 @@ class subject
   }
 
   template<typename C>
-  void notify(event e, const C *ptr, typename memberTag<C>::type f);
+  void notify(event e, const C *ptr, typename fieldEnum<C>::type f);
 
   private:
     std::vector<observer *> _observers;
@@ -137,8 +138,11 @@ class observer
     std::array<int, std::tuple_size_v<classList>> _enableFlags;
 };
 
+//! @brief notifies the event to all the subscribed observers for
+//!        which this event is enabled
+//!
 template<typename C>
-void subject::notify(event e, const C *c, typename memberTag<C>::type f) {
+void subject::notify(event e, const C *c, typename fieldEnum<C>::type f) {
   INFO("notify\n");
   for (auto observer : _observers) {
     if (observer->isEnabled<C>(e)) {

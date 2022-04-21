@@ -1,5 +1,5 @@
 
-#include "observer.h"
+#include <util/observer.h>
 
 #include <iostream>
 
@@ -7,12 +7,12 @@
 class observedClass1
 {
   public:
-    observedClass1(notification &nl) : n{nl}{}
+    observedClass1(notification &nl) : n{&nl}{}
     void setA(int val) {
-      subject *sub = n.getSubject();
-      sub->notify<observedClass1>(subject::event::premodify, this, memberTag1::A);
+      subject *sub = n->getSubject();
+      sub->notify<observedClass1>(subject::event::premodify, this, fieldEnumClass1::A);
       a = val; 
-      sub->notify<observedClass1>(subject::event::postmodify, this, memberTag1::A);
+      sub->notify<observedClass1>(subject::event::postmodify, this, fieldEnumClass1::A);
     }
     void setB(int val) {
       b = val;
@@ -20,14 +20,14 @@ class observedClass1
   private:
     int a;
     int b;
-    notification &n;
+    notification *n;
 };
 
 
 class observedClass2
 {
   public:
-    observedClass2(notification &nl) : n{nl}{}
+    observedClass2(notification &nl) : n{&nl}{}
     void setC(int val) {
       c = val;
     }
@@ -38,7 +38,7 @@ class observedClass2
   private:
     int c;
     std::vector<observedClass1> _objs;
-    notification &n;
+    notification *n;
 };
 
 
@@ -51,11 +51,13 @@ class myObserver1 : public observer
   }
   void preModify(const observedClass1 *objPtr, of1 field) override
   {
-    std::cout << "observer[myObserver1] prefModify [observedClass1] " << " field[" << static_cast<int>(field) << "]" << std::endl;
+    std::cout << "observer[myObserver1] prefModify [observedClass1] " 
+              << " field[" << static_cast<int>(field) << "]" << std::endl;
   }
   void postModify(const observedClass1 *objPtr, of1 field) override
   {
-    std::cout << "observer[myObserver1] postModify [observedClass1] " << " field[" << static_cast<int>(field) << "]" << std::endl;
+    std::cout << "observer[myObserver1] postModify [observedClass1] " 
+              << " field[" << static_cast<int>(field) << "]" << std::endl;
   }
 };
 
