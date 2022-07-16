@@ -1,0 +1,32 @@
+- folly
+    - c++ 
+    - utility library
+    - design doc available, in-code doc available
+    - https://github.com/facebook/folly
+
+- cista
+    - c++ 17
+    - serialization and reflection library
+    - single header, no dependency
+    - design doc available, in-code doc absent
+    - https://github.com/felixguendling/cista
+
+- hackingtool    
+    - https://github.com/Z4nzu/hackingtool
+
+- disque    
+    - https://github.com/antirez/disque
+
+- httpie:
+    - CLI Http client
+    - https://github.com/httpie/httpie
+
+- gnet:
+    - golang
+    - A high-performance, lightweight, nonblocking, event-loop networking library written in pure Go
+    - https://github.com/panjf2000/gnet.git
+
+- jsonbox:
+    - javascript
+    - A Free HTTP based JSON storage.
+    - https://github.com/vasanthv/jsonbox.git

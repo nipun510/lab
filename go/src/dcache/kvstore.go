@@ -1,5 +1,10 @@
 package dcache
 
+type keyValue struct {
+  Key string `json:"key"`
+  Value string `json:"value"`
+}
+
 type KVStore struct {
   id string
   data map[string]string

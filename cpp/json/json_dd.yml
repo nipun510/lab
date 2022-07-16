@@ -1,0 +1,49 @@
+json
+  - test changes
+  - language: c++
+  - interface similar to python json module.
+      - json j(12)
+        j.dumps()
+        j.insert()
+        j["key"] = value
+  - std::variant wrapped in jsonValue.
+  - classes
+      - jsonValue
+      - jsonEncoder
+      - json
+          - jsonValue
+          - jsonEncoder
+  - Design constructs
+      - strategy pattern for jsonEncoder, user can change it at runtime
+          - considered policy based design as well, but I think json can be passed around
+            and encoded/decoded as needed at run time. But policy based design will bind a particular json
+            to a particular encoder.
+      - virtual clone needed, for providing default jsonEncoderImp as well as runtime setting by user.
+          - a polymorphic object can be instance of any class in hierarchy, so not easy to identify exact class.
+          - this is prototype pattern, where given an instance, you create an exact replica of it using clone.
+      - json is a value type so behave as such:
+          - should be default constructible
+          - should be equality comparable
+          - should be copyable
+          - should be assignable
+      - json class shouldn't have compilation dependency on jsonValue    
+
+      Parsing grammar:
+        object -> '{' pairs '}'
+        pairs -> pair pairs_tail | E
+        pair -> STRING ':' value
+        pairs_tail -> ',' pairs | E
+
+        array -> '[' elements ']'
+        elements -> value elements_tail | E
+        elements_tail -> ',' elements | E
+
+        value -> STRING | NUMBER | 'true' | 'false' | 'null' | object | array
+
+  - TODO
+      - Reading from and writing to a file
+      - # Pretty Printing JSON string back
+        print(json.dumps(person_dict, indent = 4, sort_keys=True))
+      - to make json regular type  
+
+

@@ -23,6 +23,7 @@ class jsonValue
     template<typename T>
     jsonValue (const std::map<std::string, T> &obj); 
 
+    bool operator== (const jsonValue &val1, const jsonValue &val2);
     // DESTRUCTOR
     ~jsonValue(); 
 

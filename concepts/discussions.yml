@@ -1,0 +1,24 @@
+why c++/c compilation is slow but not that of golang
+  - multipe inclusion: 
+      - In c++, a header file may be included into multiple cpp files, so effectively compiled in each translation unit. 
+      - In golang, packages are compiled as per the import dependency graph.
+      - the generated object file includes type information for all dependencies that affects its public interface.
+  - recursive inclusion: 
+      - There is an issue of recursive inclusion in c++. 
+      - For example if a.cc depends on a.h and a.h depends on b.h, then a.cc indireclty includes b.h as well and 
+        is compiled in the TU of a.cc
+  - redundant inclusion: 
+      - There may be the case of unused inclusion as well. 
+      - This is an error in golang.
+  - symbol lookup at linking: 
+      - One issue that appears is searching for references in all the translations units and 
+        not just in translations units of included headers. 
+      - May be because headers and cpp files are independent in c/c++. 
+      - Satisfaction of refrences may be possible in golang as it combine both interface/header and 
+        implementation/cpp in a single unit called package.
+      - So all the dependencies can be satisfied at the compile itself.
+    
+
+
+Problems with golang:
+  - 

@@ -1,0 +1,5 @@
+C:/Users/nipunk/Desktop/workspace/lab/cpp/json/build/CMakeFiles/rebuild_cache.dir
+C:/Users/nipunk/Desktop/workspace/lab/cpp/json/build/CMakeFiles/edit_cache.dir
+C:/Users/nipunk/Desktop/workspace/lab/cpp/json/build/CMakeFiles/test.dir
+C:/Users/nipunk/Desktop/workspace/lab/cpp/json/build/CMakeFiles/jsontest.dir
+C:/Users/nipunk/Desktop/workspace/lab/cpp/json/build/CMakeFiles/jsonlib.dir

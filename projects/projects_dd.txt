@@ -1,0 +1,51 @@
+TODO:
+  - Design case insensitive type ahead using trie implementation.
+  - Design persistance storage using a B Tree.
+  - Design persistance storage using log structed storage.
+  - Design a distributed consesus system using raft algorithm in golang.
+  - Implement permission infrastructure using ACL
+  - Implement thread safe messageQueue, producer and consumer.
+
+*****************************************************************************
+redis client lib:
+
+********************************************************************************    
+cpp source file analyser
+  - parser generator + grammar/rules => parser
+  - boost cpp parser : boost::spirit:
+      - ability to define rule and grammar.
+  - flex and bison 
+  - using clang based AST for parsing
+  open source projects:
+    - https://github.com/danmar/cppcheck
+*******************************************************************************
+commond line interface
+  -classes
+    - Command
+        - Name
+        - Description
+        - innerFlagsLong
+        - innerFlagsShort
+        - CommandFunction
+        - parentCommand
+    - Parser    
+
+******************************************************************************
+  
+*****************************************************************************
+logger
+
+filesystem
+
+
+queue
+
+
+
+
+
+
+
+
+
+

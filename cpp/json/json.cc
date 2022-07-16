@@ -5,11 +5,12 @@
 
 #include <cassert>
 
-json::json(int val) : _value{new jsonValue{val}}{}
-json::json(bool val) : _value{new jsonValue{val}} {}
-json::json(const std::string &val) : _value{new jsonValue{val}} {}
-json::json(const char * val) : json(new jsonValue{val}){}
-json::json(const std::nullptr_t &val) : _value{new jsonValue{val}} {}
+json::json(): _value{nullptr}, _encoder{nullptr} {}
+json::json(int val) : _value{new jsonValue{val}}, _encoder{new defaultEncoder{}} {}
+json::json(bool val) : _value{new jsonValue{val}}, _encoder{new defaultEncoder{}} {}
+json::json(const std::string &val) : _value{new jsonValue{val}}, _encoder{new defaultEncoder{}} {}
+json::json(const char * val) : json(new jsonValue{val}), _encoder{new defaultEncoder{}}{}
+json::json(const std::nullptr_t &val) : _value{new jsonValue{val}}, _encoder{new defaultEncoder{}} {}
 
 json::~json() 
 {
@@ -50,3 +51,20 @@ json::dumps() const
   return _encoder->decode(this);
 }
 
+bool
+json::operator ==(const json &left, const json &right) 
+{
+  return (left._value == right._value);
+}
+
+
+bool
+json::operator !=(const json &left, const json &right) 
+{
+  return !(left == right);
+}
+
+jason::operator bool(const json &j) 
+{
+  return (j._value != nullptr);
+}

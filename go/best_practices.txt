@@ -1,0 +1,8 @@
+
+golang
+channel:
+  - buffered vs unbuffered channel
+  - channels can be used for pipeline eg numbers -> square -> printer.
+  - unidirectional channel types.
+  - multiplexing with select
+      - In case of multiple cases, select picks them at random.

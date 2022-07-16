@@ -1,0 +1,66 @@
+Goal: 
+  - Have a conceptual base and slowly build on it.
+  - To have adequate concepts, tricks and techniques in my arsenal.
+  - To hone problem solving skills.
+
+links
+  - conceptual problems list
+  - leetcode featured lists
+  - gfg curated lists
+  - hackerrank interview preparation kit
+
+
+conceptual:
+  - lowest-common-ancestor-of-a-binary-tree-iii:
+      - points of intersection of two lists.
+      - get point of intersection by a + c + b == b + c + a in O(1) space.
+  - word-search-ii: 
+      - given board and words, find all the words present on the board.
+      - https://leetcode.com/problems/word-search-ii/
+  - merge-sorted-array:
+      - what if we start filling from largest to smallest i.e from right most index to left most index.
+      - this way no need for extra space.
+  - smallest-string-with-swaps:
+      - given a string and array of pairs which can be swapped, find smallest string.
+      - any 2 indexe connected by swapping, can be swapped.
+      - it is possible to swap any connected component in lexographically sorted order.
+      - https://leetcode.com/problems/smallest-string-with-swaps
+  - container-with-most-water:
+      - https://leetcode.com/problems/container-with-most-water/
+      - solved, greedy, two pointer
+      - between leftptr and rightptr, one having smaller height is moved
+  - trapping-rain-water:
+        - https://leetcode.com/problems/trapping-rain-water
+        - monotonic stack stores potential left wall in order of decreasing height.
+        - array of currHeight needed to store present water heights.
+  - word break:
+        - https://leetcode.com/problems/word-break
+
+        
+tricky:      
+  - subarray-sum-equals-k:
+      - there can be more than 1 prefixes with the required sum.
+      - https://leetcode.com/problems/subarray-sum-equals-k
+  - non-decreasing-array:
+      - modify atmost 1 element to make the array non-decreasing.
+      - https://leetcode.com/problems/non-decreasing-array
+  - spiral-maxtrix:
+      - https://leetcode.com/problems/spiral-matrix/
+      - minRow, maxRow, minCol, maxCol
+      - avoid overlap
+  - build-array-from-permutation:
+      - https://leetcode.com/problems/build-array-from-permutation
+      - problem is to return array nums such that nums[i] = nums[nums[i]]  in O(1) space.
+      - trick is to use val = d * q + r and extract them as required.
+
+
+tried-but-unsolved:
+  - bus-routes:
+  - robot-room-cleaner:
+      - https://leetcode.com/problems/robot-room-cleaner/
+
+
+todo-coding:
+  - reverse-words-in-a-string
+      - https://leetcode.com/problems/reverse-words-in-a-string/
+  - LFU cache      

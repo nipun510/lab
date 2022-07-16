@@ -1,0 +1,85 @@
+    ##---------------------------##
+    #-----------------------------#
+    ##          DCACHE           ## 
+    #-----------------------------#
+    ##---------------------------##
+distributed key-value store or dcache
+  - consistent hashing used for partitioning to distribute/partition keys accross nodes in cluster.
+  - HTTP/HTTPS protocol used for communication with node.
+  - Design:
+      - client interaction:
+          - Each client request must specify a operation and associated operands using HTTP methods.
+          - One of the operands, preferably the first one must be the partitioning key.
+  - Implementatino Details:
+    - classes
+        - KeyValueStore
+        - HashRingNode
+        - HashRing
+        - Server
+    - cluster consists of multiple nodes in a ring topology. 
+    - data partitioning through consistent hashing.
+    - node handles request or returns node address responsible for handling that request.
+
+        # type HashRing struct {    
+        #   startNode *HashRingNode 
+        #  }                           
+
+      - Each hashring has a unique owner hashNode termed as startNode associated with it.
+      - This startNode is responsible for storing or retrieving keys for the server associated with this hashRing.
+      - Thie startNode is the first hash node that is added to the hash ring.  
+
+        # type HashRingNode struct {
+        #   id string
+        #   server *Server
+        #   cache *KVStore
+        #   hash []byte
+        #   nextNode *HashRingNode
+        #   prevNode *HashRingNode
+        # }
+
+
+        # type Server struct {
+        #   ip string
+        #   port string
+        #   internalPort string
+        #   node *HashRingNode
+        #   ring *HashRing
+        # }
+
+      - Each server has a hashring associated with it.
+
+    - key partitioning:
+        - when a server receives a request, a hash is computed from the key present in the request.
+        - This hash is then used to find the target hash node by traversing its hash ring.
+        - If the target hash node is the startNode of the hashRing, then the operation
+          is allowed to execute.
+        - Otherwise, the target hashNode info is returned.
+        - currently no support of virtual nodes which is used to distribute data more uniformly.
+        - In redis, fixed slots is used for key partitioning.
+      
+    TODO:  
+    - Data replication.
+
+  To Do
+    - configuration of cluster as seen by node with /info request.
+    - Failure detector
+
+  Questions:
+    - protocol to be used for client-server interaction, for server-server interaction
+        - redis uses RESP(redis serialization protocol) for client-server interaction
+
+  First Proposal for implementation of failure detection:
+    - why ?
+        - whenever a node fails, other nodes need to know about it.
+    - HeartBeat based protocol to be used to detect failing nodes.
+    - communication among servers to be done on a separate channel using UDP protocol
+    - In a cluster of N nodes, every node sends heartbeat messages to N-1 nodes and receives heartbeat packets
+      from the remaining N-1 nodes.
+    - Timeout interval > Request Interval > Network Round Trip time between servers.
+    - Redis Approach:
+        - uses gossip protocol and a configuration update mechanism in order to avoid exchanging too many messages 
+          between nodes during normal condition. 
+        - every node is connected with every other node using a TCP connection.  
+        - These TCP connections are kept live all the time.
+        - redis has a default timeout of 1000 milliseconds
+    - Issues:

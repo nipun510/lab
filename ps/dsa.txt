@@ -1,10 +1,15 @@
 
 Points to remember:
+  - rand, srand:
+      - generate random numers in the range [0, RAND_MAX]
+      - if called without srand(), same sequence of numbers each time it runs.
+      - srand(time(0)) as the seed.
+
   - finding two swapped elements in almost sorted array.
       - firstElement is greater than the next element and occurs leftmost.
       - secondElement is less than the prev element and occurs rightmost.
    
-  - Topological Ordering:
+  - topological ordering:
       - for directed acyclic graph
       - ordering such that if there is path from a to b then a occurs before b in the ordering.
    
@@ -26,7 +31,7 @@ union-find algorithm:
   - time complexity : 
       - amortized complexity: O(@(n)) where @(n) is inverse Ackermann function which grows very slowly. 
       - worst: log(n)
-  - imp: union_find.cc    
+  - imp: snippets/union_find.cc    
 
 trie:
   - space complexity: O(alphabet_size * avg_key_length * N) where N is no of keys
@@ -34,7 +39,7 @@ trie:
   - Radix tree or PATRICIA tree:
         - compressed version of a trie.
 
-Disjoint intervals/ranges:
+disjoint intervals/ranges:
   - ordered set i.e std::set<std::pair<int,int>> as an alternative to segment tree
   - insertion O(logn) : may trigger merge
   - find O(logn)

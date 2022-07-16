@@ -15,3 +15,10 @@ jsonValue::~jsonValue()
   }
 }
 
+bool 
+jsonValue::operator== (const jsonValue &val1, const jsonValue &val2) 
+{
+  if (val1
+
+}
+

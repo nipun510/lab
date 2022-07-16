@@ -1,0 +1,5 @@
+# ninja log v5
+434	2312	6722265432869553	CMakeFiles/jsonlib.dir/jsonValue.cc.obj	8ad9a202ed28a98a
+26	1697	6722265852850109	CMakeFiles/jsontest.dir/jsonTest.cc.obj	2e8406d3dcd43ab7
+27	1219	6722268308721624	CMakeFiles/jsontest.dir/jsonTest.cc.obj	2e8406d3dcd43ab7
+7	1471	6722268625227208	CMakeFiles/jsonlib.dir/json.cc.obj	9129f46907961b95

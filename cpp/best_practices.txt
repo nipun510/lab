@@ -2,6 +2,14 @@
 - know enough but not everything.
 
 
+fold expression:
+  # template<typename... Args>
+  # sum(Args... args) {
+  #   return ( 0 + ... + args);
+  # }
+  - left associative: (... + args)
+  - right associative: (args + ...)
+  - case for values can be empty: (0 + (... + args))
 cpp stl
 ******
   std::set::insert
@@ -11,55 +19,76 @@ cpp stl
     - top(), push(), pop()
     - lambda can be passed in constructor for comparision. 
 
-template interface rule:
-  - use function objects to pass operation to algorithms
-      - lambdas generate function objects.
-  - Use function templates to deduce class template argument types(where feasible)
-  - use template aliases to simplify notation and hide implementation details.
-  - require template arguments to be atleast semiregular.
-  - if your compiler does not support concepts fake them with enable_if.
-  - wherever possible, avoid type erasure.
-
-template definition rule:  
-  - minimize a template's context dependencies.
-      - template typically appear in header file so their context dependencies are more vulnerable.
-  - don't over-parametrize members
-  - place non-dependent class template members in a non-templated base class
-      - factor parameter independent code out of class templates.
-      - templates generate multiple classes and multiple functions, so any template 
-        code not dependent on a template parameter causes code bloat.
-  - In derived class templates, refer names in base class templates 
-      - via a "this->" prefix,
-      - via using declarations, or 
-      - via an explicit base class qualification. 
-      - This is because compiler has no way of determining base class members when it encounters derived
-        because base class is also templated.
-
-template and hierarchy rule:        
-  - don't naively templatize a class hierarchy
-
-template type deduction:
-  - case 1: paramType is a reference or pointer but not a universal reference.
+#----------#
+# template #
+#----------#
+  impl: snippets/template.cc
+  template interface rule:
+    - use function objects to pass operation to algorithms
+        - lambdas generate function objects.
+        - function objects can carry more information thourgh an interface than an plain pointer
+        - passing function objects in general gives better performance than passing pointers to functions.
+    - Use function templates to deduce class template argument types(where feasible)
+    - use template aliases to simplify notation and hide implementation details.
+    - require only essential properties in a template's concepts.
+    - require template arguments to be atleast semiregular.
+    - if your compiler does not support concepts fake them with enable_if.
+    - wherever possible, avoid type erasure.
+  
+  template definition rule:  
+    - minimize a template's context dependencies.
+        - template typically appear in header file so their context dependencies are more vulnerable.
+    - place non-dependent class template members in a non-templated base class
+        - factor parameter independent code out of class templates.
+        - templates generate multiple classes and multiple functions, so any template 
+          code not dependent on a template parameter causes code bloat.
+    - don't over-parametrize members
+    - In derived class templates, refer names in base class templates 
+        - via a "this->" prefix,
+        - via using declarations, or 
+        - via an explicit base class qualification. 
+        - This is because compiler has no way of determining base class members when it encounters derived
+          because base class is also templated.
+    - use specialization to provide alternative implementations of class templates.
+    - use tag dispatch to provide alternative implementation of functions.
+    - use {} rather than () within templates to avoid ambiguities.
+    - inside a template, don't make an unqualified non-member function call unless you intend to be a customization point.
+  
+  template and hierarchy rule:        
+    - don't naively templatize a class hierarchy. 
+        - virtual functions are instantiated every time in a class template. In contrast, non-vitrual functions
+          are only instantiated if they are used.
+         - It causes code bloat.
+    - don't mix hierarchies and arrays.
+        - an array of derive classes can implicity "decay" to a pointer to a base class with
+          pointential disastroud results.
+    - don't declarare a member function template virtual.
+        - not supported as vt can't be generated as no of vtable slots cannot be known within the translation unit.
+        - alternatives: double dispatch, visitor
+    - use a non-template core implementations to provide an ABI-stable interface.    
+  
+  template type deduction:
+    - case 1: paramType is a reference or pointer but not a universal reference.
+        - template<typename T>
+          void f(T& param) // paramType = "T &"
+        - reference-ness is ignored during type deduction.  
+        - const int &rx = x;
+          f(rx); // T is const int; paramType is "const inst &"
+    - case 2: paramType is a universal reference.
+       - template<typename T>
+         void f(T&& param) // paramType = "T &&"
+       - if expr is an lvalue, both T and paramType are deduced to be lvalue reference, 
+       - if expr is an rvalue, "case 1" rule applies.
+       - cont int& rx = x;
+         f(rx) // T is "const int&", paramType is "const int&"
+         f(27) // T is "int", paramType is "int&&"
+    - case 3: paramType is neither a pointer nor a reference.
       - template<typename T>
-        void f(T& param) // paramType = "T &"
-      - reference-ness is ignored during type deduction.  
-      - const int &rx = x;
-        f(rx); // T is const int; paramType is "const inst &"
-  - case 2: paramType is a universal reference.
-     - template<typename T>
-       void f(T&& param) // paramType = "T &&"
-     - if expr is an lvalue, both T and paramType are deduced to be lvalue reference, 
-     - if expr is an rvalue, "case 1" rule applies.
-     - cont int& rx = x;
-       f(rx) // T is "const int&", paramType is "const int&"
-       f(27) // T is "int", paramType is "int&&"
-  - case 3: paramType is neither a pointer nor a reference.
-    - template<typename T>
-      void f(T param); 
-    - ignore the reference part and ignore the const.  
-    - const int& rx = x;
-      f(rx); // T's and parmType are both int
-  - compilers can't deducre template type parameters from return types alone.    
+        void f(T param); 
+      - ignore the reference part and ignore the const.  
+      - const int& rx = x;
+        f(rx); // T's and parmType are both int
+    - compilers can't deducre template type parameters from return types alone.    
 
 inline:
   - in c++17, static data member can be defined within its class by using keyword inline.
@@ -90,11 +119,15 @@ misc:
   - avoid trivial getters and setters.
       - adds no semantic value, the data item could just as well be public.
 
-smart pointers:
+#----------------#
+# smart pointers:#
+#----------------#
   - use std::unique_ptr for exclusive ownershipe, std::shared_ptr for shared ownership and 
     std::weak_ptr for std::share_ptr like pointers that can dangle.
 
-concurrancy:
+#-------------#
+# concurrency #
+#-------------#
   - prefer task based-programming std::async to thread-based std::thread.
       - std::thread APIs offers no direct way to return values from asynchronously run functions, also
         if thoses functions throw exception, the program is terminated
@@ -109,7 +142,9 @@ concurrancy:
   - vectorization:
       - technique for executing a number of tasks concurrently without introducing explicit synchronization.
 
-concept:
+#----------#
+# concepts #
+#----------#
   - specify concepts for all template arguments.
   - whenever possible use standard concepts.
       void sort(sortable auto &s); 
@@ -178,6 +213,7 @@ operator overloading:
       - x = y => x == y
       - x < y and y < z => x < z
   - use non-member functions for symmetric operators.    
+      - to avoid problem when the first operand is not a class type, rather say double.
 
 lambda:
   - prefer capturing by reference in lambdas that will be used locally, including passed to algorithms.
@@ -274,4 +310,6 @@ Idioms:
       - since a container class stores stack allocated base class object, so
         derived classes don't contain any data member. 
       - Invocation of derived classes constructors and destructors made an error.  
+
+
 

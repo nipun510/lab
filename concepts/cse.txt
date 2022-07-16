@@ -1,0 +1,108 @@
+
+Categories
+  - CS concepts
+      - CS subjects
+          - Operating system
+          - computer network
+          - database management
+          - theory of computation
+          - compiler design
+          - computer architecture and organisation
+  - Problem Solving
+      - coding
+      - data structures and algo
+      - maths
+  - Object Oriented Design
+      - programming languages
+      - design patterns
+  - System Design
+      - software architecture
+      - distributed system design
+
+#------------------#
+# Computer Network #
+#------------------#
+UDP:
+  - It doesn't establish a connection before sending data, just sends it.
+  - UDP is faster than TCP because there is no:
+      - form of flow control
+      - no error checking and correction
+      - no acknowlegement
+  - DNS servers send and receive DNS requests using UDP.
+
+
+#-----------------#
+# Compiler Design #
+#-----------------#
+- Top down parsers
+    - Full Backtracking
+    - Recursive descent
+        - eliminating left recursion
+        - elimination left factoring
+    - LL(1) parsers or Non recursive Descent
+        - First set
+        - Follow set
+        - Parse table
+- Bottom up parsers
+    - LR
+      - LR(0) parser
+          - Augmented grammar
+          - Rule: If any non-terminal has '.' preceding it, write all its productions.
+          - Parsing Table
+              - Action
+              - Goto
+      - SLR parser
+          - put reduce in follow of P
+      - LALR parser
+      - CLR parser
+          - put reduce only on lookahead
+    - Operator precedence
+- Tools 
+    - Flex 
+    - Bison
+-Write json parser using all major parsing algorithms    
+
+#-----------------------#
+# Theory of computation:#
+#-----------------------#
+  - grammar:
+      - set of production rules
+      - used to generate strings of a language
+      - G : S -> aSb | E
+      - L(G) = {a^nb^n, n >= 0) 
+
+  - Chomsky classification:
+     - Type0 or unrestricted grammar 
+         - @ (V+T)*V(V+T)*  
+         - B is (V+T)*
+         - accepted by Turing machine
+     - Type1 or context sensitive grammar
+         - |@| <= |B| 
+         - accepeted by linear bound automata
+     - Type2 or context free grammar
+         - |@|  = 1
+         - accepeted by push down automata
+     - Type3 or regular grammar
+         - Restricted regular V -> VT / T or V -> TV/T
+         - Extended regular   V -> VT* / T* or V -> T*V/T*
+         - accepted by finite state automata
+
+  
+#--------------#
+# Cryptography #
+#--------------#
+  Hash function:
+    - fixed length output
+    - efficiency
+    - deterministic
+  
+  cryptographic hash function:
+  - pre-image resistance
+  - second pre-image resistance
+  - collision resistance
+
+Uses:
+  - document integrity
+  - password storage
+  - unique id
+  - proof of work

@@ -1,0 +1,327 @@
+consensus:
+  - involves multiple servers agreeing on values.
+  - typically arises in the context of replicated sate machines.
+  - each server has a state machine and a log.
+  - a consensus algorithm is used to agree on the commands in the server's log.
+  - raft algorithm:
+      - Term:
+          - At most 1 leader per term.
+          - some terms have no leader(failed election).
+          - each server maintains current term value.
+
+      - leader election:
+          - select one of the servers to acts as cluster leader.
+          - detech crashes, choose new leader.                                                              
+
+            becomes-candidate --> currentTerm++,                                             majority-vote
+                                 vote-for-self --> send-request-vote-RPCS-to-other-servers    --------->       becomes leader
+
+                                                   |                   |            |     RPC from leader
+                                                   <------- timeout -- <             >       ---------->       becomes follower  
+                                                                                                   
+          - heartbeats and timeouts to detect crashes.
+          - randomized timeouts to avoid split votes.
+          - voting rule:
+              - compare terms of last entries, break ties with log length.
+      - log replication:
+          - leader takes command from clients, appends them to its log.
+          - leader replicates its log to other server(overwriting inconsitencies).
+          - log is committed when it's acknowleged by majority servers in cluster.
+      - safety:
+          - keeps logs consistent
+          - only a server with an up-to-date log can become a leader.
+
+anomalies:
+  - dirty read:
+
+  - dirty write:
+      - conflicting writes from different transactions can be mixed-up.
+  - read-skew or non-repeatable read:
+      - a client observers the database in an incosistent state.
+  - lost-update:    
+      - race condition between two clients concurrently incrementing a counter. 
+  - write-skew:    
+      - can occur if two transactions read the same objects adn then update some 
+        of those objects.
+
+
+weak isolation levels:
+  - types:
+      - read committed:
+          - ensures no dirty read
+          - ensures no dirty write
+          - default setting in oracle 11g, PostgreSql, SQL server
+      - snapshot isolation or MVCC:
+          - each transaction reads from a consistent snapshot of the database.
+          - prevents read-skew.
+          - postgreSQL repeatable read, Oracle's seriable and SQL servers's snapshot isolation levels
+            automatically detects lost update, but MySQL's repeatable read doesn't detect lost updates.
+  - preventing lost update:
+      - atomic write operation
+      - explicit locking by application through "for update"
+      - automatically detecting lost updates
+      - compare and set
+      - conflict resolution and replication 
+          - used in replicated databases
+          - merging conflict and Last Write Wins(LWW) 
+  - write skew:         
+      - not automatically detected in PostgreSQL's repeatable read, MySQL/InnoDB's repeatable read,
+        Oracle's serializable or SQL Server's snapshot isolation level.
+      - It requires true serializable isolation.
+
+Serializability:
+  - serial execution:
+  - Two phase locking (2PL):
+      - shared lock and exclusive lock
+      - first phase(while transaction is executing) is when locks are acquired and the second phase (at the end
+        of transaction) is when all locks are released.
+      - database automatically detects deadlock between transactions and aborts one of them.
+  - serializable snapshort isolation(SSI):
+      - Detecting stale MVCC reads:
+          - when the transaction wants to commit, the database checks wheather any of the ignored writes have now
+            been committed. If so, the transaction must be aborted.
+      - Detecting writes that affect prior reads:
+          - when the transaction wants to commit, the database checks wheather and of the reads of this trasaction
+            was later updated by another transaction that has "write-conflict" and that transaction has been committed. 
+            If so, this transaction must be aborted.
+      - SSI requires that read-write transactions be fairly short(long running read-only transactions may be okay).      
+
+API gateway:
+  - insulates the clients from how the application is partitioned in microservices.
+  - insulates clients from the problem of determining the locations of service instances.
+  - translates from a "standard" public web-friendly API protol to whatever protocols are used internally.
+  - provides optimal API for each client.
+  - Reduces the no of requests/roundtrips.
+  - simplifies client by moving logic for calling multiple services from the client to API gateway.
+  - helps in managing how updates are rolled out to users.
+  - Additional Usage
+      - Rate limiting
+      - SSL termination
+      - authentication
+      - IP whitelisting
+      - servicing static content
+      
+  - backends for frontends:
+      - separate API gateway for each kind of client.
+
+Reverse proxy:
+  - A reverse proxy is a server that sits in front of one or more web servers, intercepting
+    requests from clients.
+  - This is different from a forward proxy, where the proxy sits in front of the clients.  
+  - Benfits:
+      - Load balancing
+      - Protection from attacks.
+      - GSLB
+      - Caching 
+      - SSL encryption and decrption
+
+
+
+Event sourcing:
+  - record every write as an immutable event rather than destructive state mutation on a database when writing to it.
+Event processing with event sourcing:  
+  - build aggregates(views, caches, search indexes) from that stream of events.
+
+Data infrastructure:
+  problem:
+    - There might be a large number of independent components like cache, search indexes, hadoop, notification interacting 
+      with the database, making the system complex and causes data to be present at multiple places in different forms.
+    - So, keeping data systems synchronized becomes a challenge.
+  Techniques to solve data synchronization/integration problem:
+    - Dual writes
+        - application code to update data in all the appropriate places like db, cache, index.
+        - Issues:
+            - race condition caused by multiple clients writing to the data stores in different order leding to 
+              perpetual inconsistency.
+            - partial failure in case denormalized data caused when one of the write queries execution to update 
+              redundant data fails.
+                - not an issue if single datastore and transaction is supported.
+                - wont work for NoSQL databases or multiple/distributed databases.
+                - some systems support distributed transactions but don't seems to be a good idea.
+
+  - using log:
+      - sequence of events that are totally ordered, persistent and  append-only
+      - data structure of totally ordered records that is append-only and persistent.
+      - Usage:
+          - DB storage engines
+              - Write Ahead log: 
+                  - database storage engine first write the change to WAL and stores it to disk.
+                  - Only after that it modifies the actual B-Tree pages on disk.
+                  - This prevents the data from getting corrupted.
+              - Log-structured storage:
+                  - log as primaray storage medium like HBase, Cassandra. 
+                  - writes are appended to log-segments and periodically merged-compacted in the background.
+          - DB replication
+              - In leader based replication, whenever some data is written to the leader, it is also appended to 
+                the replication log.
+              - The followers read the log in the order in which it was written and apply each of the writes to their
+                own copy of the data.
+              - None of the issues of dual write exist in this case.  
+          - Distributed consensus
+              - In Raft, a committed value is appended to the end of a log.
+              - All raft nodes are guaranteed to have exactly the same sequence of commited values in their logs.
+              - clients can consume the log.
+          - Kafka
+              - can be used as a distributed log
+              - details above
+      - solution to data integration problem:
+          - have your application only append data to a log preferrably kafka. log is the source of truth,
+          - all databases, indexes and caches contructed by reading sequentially from the log.
+          - Each datastore that needs to be kept in sync is an independent consumer of the log.
+          - No issue of race condition and partial failure.
+    
+
+Replication
+  - synchronous 
+  - asynchronous
+  - reasons:
+      - To keep data geographically close to users.
+      - To enable the system to keep working in case of failure.
+      - To scale-out no of machines to server read queries.
+  - Replication algorithms
+      - Single leader
+      - Multiple-leader 
+      - Leaderless 
+          - eg. Riak, Cassandra, Voldemort
+          - Quorams for reading and writing : w + r > n
+
+
+Time and partial order:
+  Partial and Total ordering
+  - based on anti-symmetry, transitivity, and reflexive or total
+  - global clock
+    - synchronization protocol like NTP
+    - used in casandra and google spanner
+    - limited by lack of accuracy in commodity computers and latency in case of certain protocol.
+    - Christian Algorithm;
+        - T(client) = T(server) + (T1 - T0)/2
+        - error  [ -(T1- T0)/2, (T1 - T0)/2]
+  - local clock
+  - no clock
+    - logical clock
+    - Lamport clock
+      - if ts(a) < ts(b)
+          - a may have happened before b or (for events from same process or same causal history)
+          - a may be incomparable with b (for events from independent systems)
+      - can't differentiate between casually related events and concurrent events.    
+    - vector clock
+        - maintains an array of n logical clocks [t1, t2, ...]
+        - events are concurrent if NOT (V1 <= V2) AND NOT(V2 <= V1)
+        - events are casually related if V1 < V2 iff V1 <= V2 and there exits a j such that V1[j] < V2[j]
+
+interprocess communication
+****************
+synchronous communication
+  - one-to-one request/response
+  - RPC and REST
+asynchronous communication
+  - event based or message based
+  - one to many: publish/subscribe, public/async responses
+  - loose coupling, more scalable
+
+
+RPC
+  - Java RMI, SOAP, Trift, gRPC
+  - Terms: Marsheling, Unmarshelling, server stub, client stub
+  upsides:
+    - ease of use
+  downsides:
+    - Technology coupling eg Java RMI
+    - cost associated with remote calls which get mixed with local locals.
+    - change in interface requires Server as well as client stub deployment.
+
+
+REST : REpresentational State Transfer
+  - architectural style inspired by web
+  - noun specifies resource and verbs specify operation on them.
+  - communication must be stateless and cacheable.
+  - specified no underlying protocol but HTTP 1.1 mostly used
+  - HATEOS : Hypermedia as the engine of application state
+      - representation of resource contains links to other related resources.     
+      - Clients navigate them and discovers new resources and operations.
+      - Decreased coupling between client and server.
+
+  Downsides:
+    - not well suited for low latency.
+
+Domain name system(DNS):
+  - domain name => ip address
+  - managed DNS service like CloudFare, Route 53
+  - Routing policies:
+      - geolocation based
+      - Weighed Round robing
+      - Latency based
+Load Balancer(LB):
+  - distributes incoming traffic across target servers.
+  - distribution policy
+  - has public IP and servers can have private IP.
+
+Content delivery network(CDN):
+  - proxy servers geographically distributed
+  - closer to user, reduced RTT
+  - needs redirection.
+  - cloudFront
+  - push CDNs
+      - can specify which content, when that content will expire and when it has to be updated.
+      - more storage, less traffic
+      -? preffered for sites with low traffic
+  - pull CDNs
+      - cache response until it expires.
+      - less storage, more traffic
+      -? preffered for sites with high traffic
+    
+
+Consistent hashing
+  - on average k/n keys needs to be remapped on resizing of hash table.
+  - hash space and hash ring
+  - hash servers and hash keys
+  - virtual nodes
+  - nodes addition and removal
+
+Versioning:
+  - semantic versioning : MAJOR.MINOR.PATCH
+  - Additive changes are backward-compatible if clients and servers observe robustness priciple
+      - service should provide default values for missing request attributes.
+      - client should ignore extra response attributes.
+  - expand and contract pattern.
+  - For HTTP, Putting version number in request header in MIME type or  in URL itself.
+  - For gRPC, putting methods in new namespace.
+  
+
+
+Monitoring:
+  - metrics vs log
+  - metric tracking:
+      - prometheus,
+      - graphite
+  - metrics : response time, error rate, system metrics
+  - semantic monitoring
+  - correlation IDs
+  - all log information must be collected on a central server.
+  - better to log in a standard json format.    
+  - logging Tools 
+      - logstash: can parse log data and send it to the search server as JSON
+      - Kibana : UI for visualizing, searchin and analyzing the data.
+      - logstash => elastic search => Kibana        
+      
+Testing:
+  - Unit Testing
+  - service Testing
+  - end-to-end Testing
+  - Consumer driven contracts
+  - Canary releasing
+  - Mean time to repair over mean time between failures.
+
+
+Numbers to remember:
+  - Availability:
+      - 99.99% or four 9s : 8.6s
+      - 99.9% or three 9s : 1m 26s
+  - Main memory reference: 100ns
+  - HDD = 30X SSD = 120X memory
+  - Sequential read:
+      - HDD: 30 MB/s
+      - SDD: 1 GB/s
+      - Main memory: 4 GB/s
+  - HTP codes
+      - 429: too many requests

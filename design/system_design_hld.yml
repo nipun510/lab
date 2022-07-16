@@ -1,0 +1,165 @@
+Step1 : Understand the problem and establish design scope
+  - Functional requirements
+  - Non functional requirements
+  - Extended requirements
+Step2 : Propose high level design and get buy in
+Step3 : Deep dive
+  - Capacity estimation and Constraints
+  - Scalability
+     - Load balancing
+     - CDN
+     - caching
+     - partitioning/ sharding
+     - replication
+
+******************************************************************************************************************
+Video sharing  platform
+  Example: youtube, netflix, hulu, hotstar
+  Functional Requirements:
+    - upload a video
+    - search a video by title
+    - watch a video/ sharing a video
+    - views/like/dislike
+    - comment
+  
+  Design:
+    Database:
+      - original storage: blob storage to store original Video and Thumbnail.
+      - transcodded storage: blob storage that stores tanscoded video files.
+      - video Metadata DB and cache:  
+          - video
+              - videoId|Title|Description|Thumbnail|Uploader|likes|dislikes|views
+              - videoId|url|resolution|format|size
+          - comment    
+            - CommentId|VideoId|UserId|Text|TimeOfCreation
+      - User Database
+          - userId|Name|email|age|regId
+
+    services:
+      - transcoding servers: converts video formats to other formats
+    Completion queue: stores information about video transcoding completion events.
+    Completion handlers: pull event data from the completion queue and update metadata cache and database.  
+    
+    update the metadata:  
+    user --> load balancer --> API servers --> Metadata DB and cache
+
+    video uploading:
+    user --> original storage --> transcodin servers --> completion queue --> completion handlers --> metadata db and cache
+                                       |
+                                       V
+                                       transcoded storage --> CDN
+      
+    video streaming:
+    client --> CDN  
+
+    - Bitrate: rate at which bits are processed over time 
+    - video inspection:
+        - for data corruption in transmission and storage
+        - video broken into multiple chunks for parallel inspection 
+    - video endcoding into multiple formats:
+        - chunks of source file for parallelization.
+        - encoding into a number of codec profiles to support multiple devices and bandwidth capacities.
+    - video deduplication:
+          - algorithms to detect if the video or part of it is already present.
+
+******************************************************************************************************************
+New Feed system
+  Design:
+  Services:
+    - NewsFeedGeneration service
+        - asynchronous or offline mode
+        - generates mapping of userId and (NewsfeedId, Newsfeed) + lastGenerated
+        - stored in memory/cache
+    - NewsFeedPublishing service
+        - when users refresh/reload
+        - long polling
+
+  Fanout Approach
+    - Fanout on write or push model
+    - Fanout on load or pull model
+        - For posts of celebrity users 
+    - Hybrid approach
+
+    Data model
+      UserDB
+        - NewsFeedIdUserId Table : newsFeedId|userId
+        - User Table: userId|userName|emailId|DOB|lastLogin|created
+        - Friends Table: userId1|userId2
+      NewsFeed DB
+        - NewsFeed: newsFeedId|userId|content|creationTime
+
+
+*******************************************************************************************************************
+Chat System
+  Example : whatsApp, facebook messenger
+  
+  Functional Requirements:
+   - mobile app or a web app or both
+   - One to one Chat and group chat
+   - support of Text, images, videos
+   - message size limit
+   - send, delivered and read receipt
+   - Online status and Last seen
+   - encryption and storage
+   - DAU
+  
+  Design:
+   - API servers
+     - userConnection service
+       - user web socket connection info
+     - user service  
+     - Message service
+     - Group service
+   - Chat service
+   - Group Chat service
+   - Presence service
+     - keeps track of user online status
+   - Notification service
+   
+  HTTP long polling vs websocket
+    Why websocket
+     - asynchronous updates from server to client.
+     - low latency 2 way communication
+     - persistent connection.
+
+  Caching of user-chat server in each chat server itself
+  Make copies of group message and sending them similar to 1-1 message vs handling group message separately.   
+
+  message ordering
+   - each user has its own view of ordering of messages irrespective of global ordering.
+  service discovery
+   - client -> load balancer -> API server -> zookeeper -> chat server
+   - Service discovery based on predefined criteria like geographical location, server capacity through Zookeeper.
+  
+
+***********************************************************************************************************************  
+Notification system
+  - Mobile push notification, SMS message, Email
+  - Supports multiple devices: mobile, laptop, tab
+  - supports muliple platforms: ios, android
+  - Notififcation approaches:
+      - push model:
+          - server sends notification to the client devices.
+          - Issues:
+              - device may not be online and therefore can miss notification.
+      - pull model:
+          - clients requests for updates at regular intervals and server sends responses.
+          - Issues:
+              - may led to chatty communication between client and server. This is not preferred as there is per-app communicatino limits
+                Also device may have low bandwidth connection which is not good for chatty communication.
+      - Therefore a hybrid model can be adopted.             
+
+
+**********************************************************************************************************************
+Rate limiter
+  - Algorithms
+      - token bucket
+      - leaking bucket
+          - bucket size
+          - outflow rate
+      - fixed window
+      - slinding window log
+      - slinding window counter
+  - distributed environment
+      - race condition
+      - synchronization

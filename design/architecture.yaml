@@ -1,0 +1,23 @@
+
+domain:
+  - a sphere of knowlege or activity
+  - the critcal complexity of many software projects is in understanding the domain itself.
+
+bounded-context:    
+  - a defined part of the software where particular items, definations and rules apply consistently.
+  - We have so many problems,so different from each other, cluster sets of similar problems and 
+    address each with a distinct, specialized language
+  - many 'ubiquitous' language.
+  - Make boundaries in the software within which a single language is used.
+  - make use-cases ==> identify bounded-contexts ==> models ==> psuedo-code/code
+
+model:
+  - domain model doesn't reflect real life, instead it is an abstraction.
+  - A system of abstractions representing selected aspects of a domain
+  - A model distills knowledge and assumptions about a domain
+  - needs focus on a specific, difficult important problem, not completeness
+ubiquitous language: 
+  - A language structured around the domain and used by all team members
+    to connect all the activities of the team with the software.
+
+    
