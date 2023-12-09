@@ -1,0 +1,43 @@
+
+Tools:
+Amazon Simple Notification Service(SNS):
+  - distributed publish-subscribe system
+  - messages are pushed to the subscribers.
+Amazon Simple Queuing Service(SQS):
+  - distributed queuing system
+  - messages are not pushed to receivers.
+  - Receivers have to poll or pull messages for SQS.
+  - Messages can be stored for a short duration of time(max 14 days)
+Elastice Cache:
+  - redis
+
+Kafka:
+  - A topic is split into partitions.
+  - Each partition is log that is totally ordered sequence of messages.
+  - Different partitions are completely independent from one another so there is no ordering guarantee across different
+    partitions.
+  - Each partition is stored on disk and replicated across several machines.  
+  - messages are consumed sequentially based on offset or log-position managed by consumers.
+  - well suited for application where ordering matters like logging of events.
+  - kafka producer:
+      - components:
+          - serializer: converts the object to the byte array
+          - partitioner: computes the partition for the given record
+          - record accumulator: accumulates records and groups them by topic-partition into batches.
+          - sender: background thread that sends data to the Kafka cluster.
+      - users can control partition assignment via message key or pluggable ProducerPartioner implementation.  
+
+AMQP and JMS-based queues:
+  - broker keeps track of acknowledgements from consumers.
+  - If a consumer dies without acknowleging a message, the broker retries delivery.
+  - messages can be delivered out of order.
+  - well suited for job-queues where one service asks another service to perform some task.
+
+Cassandra:
+  - optimized for high write throughput
+  - Query driven data modeling
+      - spread data evenly around the cluster
+      - minimize the no of partition reads
+      - trade-off based on query and usercase
+  - partition key and clustering key => compound primary key    
+  - consistencey can be tuned    

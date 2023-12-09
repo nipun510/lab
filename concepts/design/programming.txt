@@ -1,0 +1,80 @@
+
+
+
+5th April [WED]
+     https://www.fluentcpp.com/2018/12/11/overview-of-std-map-insertion-emplacement-methods-in-cpp17/
+	- In-place construction is a technique that bypasses construction and destruction of temporaries 
+	  by constructing the objects directly in the map
+2nd April March[THURS]
+	-  http://www.vishalchovatiya.com/using-std-map-wisely-with-modern-cpp/
+
+29th March[WED]
+	- advanced reading on designing concurrent data structure:
+			- techniques to ensure there is no memoy leak in concurrent code.
+
+28th March[TUES]
+	- https://www.youtube.com/watch?v=ZQFzMfHIxng
+
+
+
+Date:- 19th March 2023 [SUN]
+
+synchronizes-with relationship
+	Atomic write operation W on a variable x synchronizes with a atomic read operation that reads the value stored by either that write(W) or a subsequent atomic write operation on x by the same thread that permformed the initial write W, or a sequence of atomic read-modify-write operations on x by any thread, where the value read by the first thread in the sequence is the value written by W.
+
+	If an operation A in one thread synchronizes with operation B in another thread, then 
+	A inter-thread happens before B. It's also a transitive relation.
+
+sequentially consistent ordering:
+	- all threads must see the same order of operation.
+	- most expensive  memory ordering as it requires global synchronization.
+
+relaxed ordering
+	- don't participate in synchronizes with relationship.
+	- once a given thread has seen a particular value of an atomic variable, a subsequent read by that thread can't retrieve an ealier value of 
+	  the   variable.
+	
+acquire-release ordering
+	a release operation synchrnizes with an acquire operation that reads the value written.
+	
+memory order consume
+	- if the result of an operation A is used an operand for an operation B, then A
+	  carries-a-dependency-to B.
+	- dependency-ordered-before relationship can apply between threads.
+	- if A is dependecncy ordered before B, then A is also inter thread happens before B.
+	
+https://stackoverflow.com/questions/6319146/c11-introduced-a-standardized-memory-model-what-does-it-mean-and-how-is-it-g
+
+
+
+Date: 21st March 2023 [TUES]
+
+Avoid Recursive Template Instantiations
+	Recursive template instantiations can result in a significant load on the compiler 
+          and more difficult to understand code.
+	Consider using variadic expansions and folds when possible instead.
+
+TODO: callgrind converter and visualizing the results with kcachegrind
+Reduce Temporary Objects
+	This will allow compiler for performing a move operation.
+ A polymorphic class should suppress public copy/move.
+	To avoid slicing.
+	
+Pointers have, by design, a flaw. They model two completely different semantics: ownership and borrowing.
+    Owner: You are the owner of the Window. You have to take care of it and destroy it. 
+           If not, you have a memory leak.
+    Borrower: You are not the owner of the Window. You can not destroy it. 
+              If you destroy it, you have a double delete.
+
+	In modern C++, we don't transfer ownership with a raw pointer.
+	std::unique_ptr<Window>: Returning a std::unique_ptr<Window> means that the caller is the owner. 
+	std::shared_ptr<Window>: Returning a std::shared_ptr<Window> means that the caller and 
+          the called share ownership.
+	
+	
+	
+	
+24th March 2023
+	
+	Typically, the OS will suspend a blocked thread completely (and allocate its time slices to another thread) until it’s
+	unblocked by the appropriate action of another thread

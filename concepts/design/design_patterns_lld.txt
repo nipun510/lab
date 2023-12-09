@@ -1,0 +1,237 @@
+
+#-----------------------------#
+# Behaviorial Design patterns #
+#-----------------------------#
+
+visitor:
+  - lets you separate algorithms from an object on which it operates.
+  - used when you need to perform an operation on all elements of a complex object structure eg tree or graph.
+  - separates objects and operations into two separate class hierarchies.
+  - can be used to clean-up business logic of auxiliary behaviors
+  - double dispatch or double polymorphism i.e resolution of both the object and operation has to be done.
+  - eg snippets/visitor.h
+      
+observer:
+  - lets you define a subscription mechanism to notify multiple objects about any events that happen
+    to the object they are observing.
+  - one-to-many dependency between objects can be defined without making the objects tightly coupled.
+  - used when changes to the state of one object may require changing other objects, and the actual set of 
+    objects is unknown beforehand or changes dynamically.
+  - impl: snippets/observer.h  
+    
+strategy:
+  - lets you define a family of algorithms, put each of them into a separate class, and make their objets
+    interchangeable.
+  - used when you want to use different variants of an algorithm within an object and be able to switch
+    from one algorithm to another during runtime.
+  - used to isolate business logic of a class from the implementation details of algorithms.  
+  - use when the class has massive conditional operator that swithches between different variants of the same
+    algorithm.
+
+
+state:
+  - allows an object alter its behavior when its internal state changes, It appears as if the object changed its class.
+  - used when you have an object that behaves differently depending on its current state and state-specific code chages 
+    frequently.  
+  - impl: snippets/state.h  
+
+template method:
+  - defines the skeleton of an algorithm in the superclass but lets subclass override speicif steps
+    of the algorithm without changing its structure.
+  - used when several classes contain almost idential algorithms with some minor differences.
+    As a result, you might to modify both classes when the algorithm changes.
+  - impl: snippets/template.h  
+    
+command:
+  - encapsulates a request as an object, thereby letting you parametrize other objects with different
+    requests, queue or log requests and support undoable operations.
+  - invoker, receiver, commandI, concreteCommands  
+  - invoker doesn't know to interact with receiver but can satisfy request on receiver indirectly through commands.  
+  - impl: snippets/command.h  
+
+iterator:
+  - provides a way to access the elements of an aggregate object sequentially without exposing 
+    its underlying representations(list, stack, tree etc).
+  - used when you collection has a complex data structure under the hood, but you want to hide its
+    complexity from clients.
+  - impl: snippets/iterator.h  
+
+mediator:
+  - allows you reduce chaotic dependencies between objects by restricting direct communication between the objects
+    and forces them to collaborate only via a mediator object.
+  - used when it's hard to change some of the classes because they are tightly coupled to a bunch of other classes.
+  - used when you can't reuse a component in a different program because it's too dependent on other components.
+  - eg: lots of GUI elements can be organised so that they cooperatre with the help of a mediator but don't depend on each other.
+  - impl: snippets/mediator.h
+
+memento:
+  - allows to save and restore the previous state of an object without reveling the details of its implementation.
+  - impl: snippets/memento.h
+
+chain of responsibility:
+  - allows to pass requests along a chain of handlers. 
+  - Upon receiving a request, each handler decides either to proces the request or pass it to the next handler in the chain.
+  - used when your program is expected to process different kinds of requests in various ways but the exact types of requests
+    and their sequences are unknown beforehand.
+  - Used when it's essential to execute several handlers in a particular order.
+  - Used when the set of handlers and their order are supposed to change at runtime.
+  - impl: snippets/chain_of_responsibility.h
+
+policy-based design:
+  - compile time variant of strategy pattern
+  - using policies to represent different behaviours.
+  - used for scenario where no runtime behavior substution is needed, behavior is decided at compile time.
+  - compile time, no virtual functions so no runtime cost.
+  - eg: policy_based_design.cc
+
+
+
+#----------------------------#
+# creational Design patterns #
+#----------------------------#
+  singleton:
+    - ensures a class has only one instance
+    - provides a global point of access to the instance.
+    - multithreading handling
+    - impl: snippets/singleton.h
+  
+  builder:
+    - lets you to construct complex objects step by step.
+    - doesn't allow other objects to access it while it is being built.
+    - allows to produce different types and representation of an object using the same construction code.
+    - Avoid ugly contructor calls or telescopic constructor.
+    - director simply "notifies" the builder whenever a part of the product should be  built, which can be
+      perfectly done by client.
+    - builder interface, concrete builders, director(optional).
+    - example:
+        - House construction
+    - impl: snippets/builder.h
+  
+  factory method:
+    - defines an interface for creating an object in a superclass  but 
+      let the subclasses decide which concrete classes to instantiate.
+    - used when exact types and dependencies of the objects your code should work with are not 
+      known beforehand.
+    - creator, concreateCreators, product, concreteProducts.
+    - example:
+        - pizzaStore, NYPizzaStore
+        - Logistics, RoadLogictics, SeaLogistics
+    - impl: snippets/factorymethod.h    
+    
+  abstract factory:
+    - lets you produce families of related objects without specifying their concrete classes.
+    - client doesn't have to depend upon concrete instance of factories or products, ensures extensibility.
+    - concrete factories themselves are created based on business logic or platform choices.
+    - abstract factory, concrete factories, products, concrete products.
+    - example: Furniture factory, GUI
+    - impl : snippets/abstract_factory.h    
+  
+  prototype:
+    - lets you copy existing objects without making your code dependent on their classes.
+    - hides the complexity fo making new instances from the client.
+    - The creation is done with the help of clone() method
+    - prototype, concretePrototype, prototypeRegistry, clone method
+
+#----------------------------#
+# Structural Design Patterns #
+#----------------------------#
+
+  adapter:
+    - converts the interface of a class into another interface the client expect.
+    - Targer<interface>, Adapter, Adaptee
+    - Types
+        - class Adapter
+        - object Adapter
+  
+  bridge:
+    - use to vary not only your implementations but also you abstractions.
+    - prevents geometric increase in number of subclasses by using composition instead of inheritance.
+    - Remote,  Device
+  
+  composite:
+    - lets you compose objects in tree structures and then work with these structures as if they were individual objects.
+    - component, leaf, composite
+    
+  decorator: 
+    - attaches additional responsibilities to an object dynamically.
+    - provides a flexible alternative to subclassing for extending functionality.
+    - Component, ConcreteComponent, Decorator, concreteDectors 
+    - Decorator derives from Component as well as compose component.
+    - Example : Design bevarage with types HouseBlend, DarkRost, Decaf, Espresso and Condiment like milk, Mocha, Soy, Whip
+                Design application to writeData with features like encryption, compression etc 
+  
+  facade: 
+      - provides a simplified interface to a library, a framework, or any other other complex set of classes.
+      - application classes don't depend on  a billion classes provided by complex framework but just on facade.
+      - provides simple interface to the wrapped set of classes.
+  
+  flyweight:
+    - lets fit more objects into the available amount of RAM by sharing common parts of state i.e extrinsic state storage.
+    - needed when a huge no of objects is required which barely fit in memory.
+    - flyweight and immutability.
+    - flyweightFactory, flyweight, context, client
+    - eg: treeFactory, treeType, tree, forest
+  
+  proxy: 
+    - lets you provid a substitute or placeholder for another object.
+    - controls access to the original object. 
+    - allows to perform something before or after the request goes through to the original object.
+    - Uses:
+        - lazy initialization
+        - access control
+        - remote service
+        - logging proxy
+        - caching proxy
+        - smart reference
+    - serviceInterface, service, proxy, client
+    - eg : thirdPartyYoutubeInf,  thridPartyYoutubeClass, cachedYoutubeClass, youtubeManager
+  
+#-------------------#
+# SOLID principles: #
+#-------------------# 
+  single responsibility principle:
+    - a class should have just one reason to change.
+    - eg: employee, timeSheetReport
+
+  open/closed principle:
+    - classes should be open for extension but closed for modification
+    - A class shouldn't depend on concrete classes but on interface.
+    - eg: strategy pattern.
+
+  liskov substitution principle:
+    - subclasses objects should be able to be passed in place of objects of super class without breaking the client code.
+    - critical when developing libraries and frameworks.
+    - points to consider for subclass:
+       - parameter types and return types.
+       - pre-conditions and post-conditions
+       - exception
+       - invariants of superclass
+       - shouldn't change values of private fields of super class
+    - eg: document, readOnlyDocument/writableDocument, project   
+
+  interface segregation principle:
+    - interfaces should be narrow enough that client classes don't have to implement behaviours they don't need.
+    - eg: CloudProvider interface should be divided into CloudHostingProvider, CloudStorageProvider and CDNProvider interfaces.
+      
+  dependency inversion priciple:
+    - depend upon abstraction, don't depend upon concrete classes.
+    - high level classes shoudn't depend on low-level classes and vice-versa. Both should depend on abstractions.
+    - eg: factory method pattern
+
+#--------------------#
+# design principles: #
+#--------------------#  
+  - Encapsulate what varies
+  - Favor composition over inheritance
+      - can't reduce the interface of the superclass.
+      - overriding methods must have compatible behavior with the base ones. see liskov substitution
+      - breaks encapsulation of the superclass,  tight coupling.
+      - can lead to creation of parallel inheritance hierarchies. For vehicles, cargoType * engineType * navigationType
+  - Hollywood principle:
+      - Don't call us, we'll call you.
+      - high level components call low level components and low-level components hook themselves into a system.
+  - objects relation
+      - association
+      - composition
+      - aggregation
+
