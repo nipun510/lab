@@ -2,7 +2,7 @@ package dcache
 
 import (
   "bytes"
-  "mutility"
+  "lab.com/mutility"
   "errors"
 )
 

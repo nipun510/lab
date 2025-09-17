@@ -1,7 +1,7 @@
 package main
 
 import (
-  "dcache"
+  "lab.com/dcache"
   "fmt"
 )
 
