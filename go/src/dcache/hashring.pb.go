@@ -25,7 +25,6 @@ type KeyValue struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-	Found         bool                   `protobuf:"varint,3,opt,name=found,proto3" json:"found,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -72,13 +71,6 @@ func (x *KeyValue) GetValue() string {
 		return x.Value
 	}
 	return ""
-}
-
-func (x *KeyValue) GetFound() bool {
-	if x != nil {
-		return x.Found
-	}
-	return false
 }
 
 type GetResponse struct {
@@ -241,11 +233,10 @@ var File_hashring_proto protoreflect.FileDescriptor
 
 const file_hashring_proto_rawDesc = "" +
 	"\n" +
-	"\x0ehashring.proto\x12\x06dcache\"H\n" +
+	"\x0ehashring.proto\x12\x06dcache\"2\n" +
 	"\bKeyValue\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value\x12\x14\n" +
-	"\x05found\x18\x03 \x01(\bR\x05found\"K\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\"K\n" +
 	"\vGetResponse\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value\x12\x14\n" +
