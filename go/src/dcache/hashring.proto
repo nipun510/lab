@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package dcache;
+option go_package = "./;dcache";
+
+service HashRingNode {
+  rpc Set (KeyValue) returns (SetResponse);
+  rpc Get (KeyRequest) returns (GetResponse);
+}
+
+message KeyValue {
+  string key = 1;
+  string value = 2;
+  bool found = 3;
+}
+message GetResponse {
+  string key = 1;
+  string value = 2;
+  bool found = 3;
+}
+
+message KeyRequest {
+  string key = 1;
+}
+
+message SetResponse {
+  bool ok = 1;
+  string error = 2;
+}

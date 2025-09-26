@@ -2,35 +2,64 @@ package dcache
 
 import (
 	"bytes"
+	"context"
 	"errors"
 
 	"lab.com/mutility"
 )
 
 type HashRingNode struct {
-	id       string
-	server   *Server
-	cache    *KVStore
-	ring     *HashRing
-	hash     []byte
-	nextNode *HashRingNode
-	prevNode *HashRingNode
+	id         string
+	server     *Server
+	cache      *KVStore
+	ring       *HashRing
+	grpcPort   string
+	grpcServer *HashRingNodeGRPCServer
+	hash       []byte
+	nextNode   *HashRingNode
+	prevNode   *HashRingNode
 }
 
-func NewHashRingNode(id string, cache *KVStore) *HashRingNode {
+func NewHashRingNode(id string, grpcPort string) *HashRingNode {
 	// ring, nextNode, and prevNode will be set when the node is added to a ring
 	newNode := &HashRingNode{
-		id:    id,
-		hash:  mutility.ComputeSHA1Hash(id),
-		cache: cache,
+		id:         id,
+		grpcPort:   grpcPort,
+		grpcServer: nil, // Temporary nil, will set below
+		hash:       mutility.ComputeSHA1Hash(id),
+		cache:      NewKVStore(id + "_kv"),
 	}
+	newNode.grpcServer = NewHashRingNodeGRPCServer(newNode)
 	return newNode
+}
+
+func (node *HashRingNode) startNode() error {
+	err := node.grpcServer.StartGRPCServer()
+	if err != nil {
+		ErrorLogger.Printf("Failed to start gRPC server: %v", err)
+		return err
+	}
+	InfoLogger.Printf("Started Node[%s] with id[%x]", node.id, node.hash)
+	return nil
 }
 
 func (node *HashRingNode) DbSize() int64 {
 	count := len(node.cache.data)
 	InfoLogger.Printf("dbSize of node[%s] is [%d]", node.id, count)
 	return int64(count)
+}
+
+func (node *HashRingNode) Set(key, value string) error {
+	InfoLogger.Printf("Setting key[%s] to value[%s] in node[%s] cacheStore", key, value, node.id)
+	node.cache.Set(key, value)
+	DebugLogger.Printf("key[%s] with hash[%x] is stored on node[%s]", key, mutility.ComputeSHA1Hash(key), node.id)
+	return nil
+}
+
+func (node *HashRingNode) Get(key string) (string, bool, error) {
+	InfoLogger.Printf("Getting key[%s] from node[%s] cacheStore", key, node.id)
+	value, ok := node.cache.Get(key)
+	return value, ok, nil
 }
 
 type HashRing struct {
@@ -42,7 +71,6 @@ func NewHashRing(node *HashRingNode) *HashRing {
 	ring.startNode.ring = ring
 	ring.startNode.nextNode = ring.startNode
 	ring.startNode.prevNode = ring.startNode
-	InfoLogger.Printf("ring formed having node[%s] with id[%x]", ring.startNode.id, ring.startNode.hash)
 	return ring
 }
 
@@ -51,7 +79,7 @@ func (ring *HashRing) AddNode(newNode *HashRingNode) {
 		ring.startNode.ring = ring
 		ring.startNode.nextNode = ring.startNode
 		ring.startNode.prevNode = ring.startNode
-		InfoLogger.Printf("node[%s] added to ring with id[%x]", ring.startNode.id, ring.startNode.hash)
+		InfoLogger.Printf("Added node[%s] to ring with id[%x]", ring.startNode.id, ring.startNode.hash)
 		return
 	}
 
@@ -62,7 +90,7 @@ func (ring *HashRing) AddNode(newNode *HashRingNode) {
 	newNode.nextNode = targetNode
 	newNode.prevNode = prevNode
 	newNode.ring = ring
-	InfoLogger.Printf("node[%s] added to ring with id[%x]", newNode.id, newNode.hash)
+	InfoLogger.Printf("Added node[%s] to ring with id[%x]", newNode.id, newNode.hash)
 }
 
 func (ring *HashRing) findTargetNodeByString(key string) *HashRingNode {
@@ -100,7 +128,7 @@ func (ring *HashRing) getAllNodesAddress() ([]string, error) {
 
 	for currNode := ring.startNode.nextNode; currNode != ring.startNode; currNode = currNode.nextNode {
 		addressList = append(addressList,
-			currNode.server.ip+":"+currNode.server.port)
+			currNode.server.IP+":"+currNode.server.PORT)
 	}
 	return addressList, nil
 }
@@ -108,24 +136,43 @@ func (ring *HashRing) getAllNodesAddress() ([]string, error) {
 func (ring *HashRing) Set(key, value string) error {
 	targetNode := ring.findTargetNodeByString(key)
 	if targetNode != ring.startNode {
-		InfoLogger.Printf("key[%s] is not present on node[%s], correct destination node[%s]", key, ring.startNode.id, targetNode.id)
-		return errors.New("Wrong Node")
+		InfoLogger.Printf("Forwarding Set request for key[%s] to node[%s] at %s:%s", key, targetNode.id, targetNode.server.IP, targetNode.grpcPort)
+		grpcClient, err := NewHashRingNodeGRPCClient(targetNode.server.IP + ":" + targetNode.grpcPort)
+		if err != nil {
+			InfoLogger.Printf("Failed to create gRPC client for node[%s] at %s:%s", targetNode.id, targetNode.server.IP, targetNode.grpcPort)
+			return err
+		}
+		_, err = grpcClient.Set(context.Background(), &KeyValue{Key: key, Value: value})
+		if err != nil {
+			InfoLogger.Printf("gRPC Set request to node[%s] failed: %v", targetNode.id, err)
+			return err
+		}
+		return nil
 	}
-	kvStore := targetNode.cache
-	kvStore.Set(key, value)
-	DebugLogger.Printf("key[%s] with hash[%x] is stored on node[%s]", key, mutility.ComputeSHA1Hash(key), targetNode.id)
-	return nil
+	return targetNode.Set(key, value)
 }
 
-func (ring *HashRing) Get(key string) (string, error) {
+func (ring *HashRing) Get(key string) (string, bool, error) {
 	targetNode := ring.findTargetNodeByString(key)
-	if targetNode != ring.startNode {
-		InfoLogger.Printf("key[%s] is not present on node[%s], correct destination node[%s]", key, ring.startNode.id, targetNode.id)
-		return "", errors.New("Wrong Node")
+	if targetNode == ring.startNode {
+		return targetNode.Get(key)
 	}
-	kvStore := targetNode.cache
-	DebugLogger.Printf("owner node for key[%s] is node[%s]", key, targetNode.id)
-	return kvStore.Get(key), nil
+
+	InfoLogger.Printf("key[%s] is not present on this node. Forwarding request to node[%s]", key, targetNode.id)
+	grpcClient, err := NewHashRingNodeGRPCClient(targetNode.server.IP + ":" + targetNode.grpcPort)
+	if err != nil {
+		InfoLogger.Printf("Failed to create gRPC client for node[%s] at %s:%s", targetNode.id, targetNode.server.IP, targetNode.grpcPort)
+		return "", false, err
+	}
+	resp, err := grpcClient.Get(context.Background(), &KeyRequest{Key: key})
+	if err != nil {
+		InfoLogger.Printf("gRPC Get request to node[%s] failed: %v", targetNode.id, err)
+		return "", false, err
+	}
+	if resp == nil {
+		return "", false, errors.New("received nil response from gRPC Get")
+	}
+	return resp.Value, resp.Found, nil
 }
 
 func (ring *HashRing) DbSize() int64 {

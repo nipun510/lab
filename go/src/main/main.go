@@ -11,7 +11,8 @@ func main() {
     fmt.Println("No test provided")
     return
   }
-  if os.Args[1] == "dcache" {
+  if os.Args[1] == "dcache" && len(os.Args) == 3 {
     runNode(os.Args[2])
   }
+  fmt.Println("No method selected")
 }
