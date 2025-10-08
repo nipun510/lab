@@ -93,6 +93,11 @@ func (ring *HashRing) AddNode(newNode *HashRingNode) {
 	InfoLogger.Printf("Added node[%s] to ring with id[%x]", newNode.id, newNode.hash)
 }
 
+func (ring *HashRing) resetNodes() {
+	ring.startNode.nextNode = ring.startNode
+	ring.startNode.prevNode = ring.startNode
+}
+
 func (ring *HashRing) findTargetNodeByString(key string) *HashRingNode {
 	return ring.findTargetNodeByHash(mutility.ComputeSHA1Hash(key))
 }
@@ -120,17 +125,20 @@ func (ring *HashRing) findTargetNodeByHash(keyHash []byte) *HashRingNode {
 	return ring.startNode
 }
 
-func (ring *HashRing) getAllNodesAddress() ([]string, error) {
-	var addressList []string
+func (ring *HashRing) getNodesInfo() []ServerAddr {
+	// return slice of ServerAddr
+	var nodesInfo []ServerAddr
 	if ring.startNode == nil {
-		return addressList, nil
+		return nodesInfo
 	}
+	currNode := ring.startNode
+	nodesInfo = append(nodesInfo, ServerAddr{ID: currNode.id, IP: currNode.server.IP, PORT: currNode.server.PORT, GRPCPORT: currNode.grpcPort})
+	currNode = currNode.nextNode
 
-	for currNode := ring.startNode.nextNode; currNode != ring.startNode; currNode = currNode.nextNode {
-		addressList = append(addressList,
-			currNode.server.IP+":"+currNode.server.PORT)
+	for ; currNode != ring.startNode; currNode = currNode.nextNode {
+		nodesInfo = append(nodesInfo, ServerAddr{ID: currNode.id, IP: currNode.server.IP, PORT: currNode.server.PORT, GRPCPORT: currNode.grpcPort})
 	}
-	return addressList, nil
+	return nodesInfo
 }
 
 func (ring *HashRing) Set(key, value string) error {

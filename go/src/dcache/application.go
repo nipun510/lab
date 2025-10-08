@@ -17,6 +17,7 @@ func NewApplication(server *Server) *application {
 
 func (app *application) configureRouter() {
 	app.router.HandleFunc(http.MethodGet, "/ping$", app.Pong)
+	app.router.HandleFunc(http.MethodGet, "/info$", app.Info)
 	app.router.HandleFunc(http.MethodGet, "/kv$", app.Get)
 	app.router.HandleFunc(http.MethodPost, "/kv$", app.Set)
 }
@@ -34,6 +35,20 @@ func (app *application) Start() {
 func (app *application) Pong(w http.ResponseWriter, req *http.Request) {
 	DebugLogger.Println("RequestHandler: Pong")
 	fmt.Fprintf(w, "pong")
+}
+
+func (app *application) Info(w http.ResponseWriter, req *http.Request) {
+	DebugLogger.Println("RequestHandler: Info")
+	info := app.appServer.node.ring.getNodesInfo()
+	js, err := json.Marshal(info)
+	if err != nil {
+		ErrorLogger.Printf("Could not marshal info: %s", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
 }
 
 func (app *application) Set(w http.ResponseWriter, req *http.Request) {

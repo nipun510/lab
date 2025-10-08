@@ -7,6 +7,7 @@ replace mutility => ../mutility
 replace lab.com/mutility => ../mutility
 
 require (
+	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
 	lab.com/mutility v0.0.0-00010101000000-000000000000
